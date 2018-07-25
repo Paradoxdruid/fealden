@@ -2,7 +2,7 @@ import sensor, node, fold
 
 import random, time, os, subprocess, sys
 
-RNA_PATH = '/path/to/RNAstructure'
+RNA_PATH = '/Users/abonham/Downloads/RNAstructure'
 
 sys.path.append(f'{RNA_PATH}/exe')
 os.environ['DATAPATH']=f'{RNA_PATH}/data_tables'

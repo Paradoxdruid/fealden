@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 
-import seed, multiprocessing, copy, sensor, os, timeit, time, argparse, re, random, sys, shutil, tempfile
+import seed
+import multiprocessing
+import copy
+import sensor
+import os
+import timeit
+import time
+import argparse
+import re
+import random
+import sys
+import shutil
+import tempfile
 # added os.system and sys
-BINDING_STATE = {'DS' : 0, 'SS' : 1}
+BINDING_STATE = {'DS': 0, 'SS': 1}
 tempdir = 'tmp'
 verbose = False
 
@@ -18,42 +30,58 @@ verbose = False
         None
     Returns:
         Nothing
-''' 
+'''
+
+
 def __main__():
     parser = argparse.ArgumentParser()
-    parser.add_argument("recSeq", type=str,\
+    parser.add_argument("recSeq", type=str,
                         help="The sequenced recognized by your target \
                         represented as a string comprised of the letters 'a', 'A', 't', \
                         'T', 'c', 'C', 'g', and 'G'.")
-    parser.add_argument("bindingState", type=int, \
-                        help="The state of the sequence when bound to the target.\
+    parser.add_argument(
+        "bindingState",
+        type=int,
+        help="The state of the sequence when bound to the target.\
                         \n This is 0 if your target binds to a double stranded sequence\
                         and 1 if it binds to a single stranded sequence.")
-    parser.add_argument("-ms", "-max_size", type=int, \
-                        help = "The maximum number of bases allowed in your sensor.\
+    parser.add_argument(
+        "-ms",
+        "-max_size",
+        type=int,
+        help="The maximum number of bases allowed in your sensor.\
                         This number must be greater than 20 and should probobly be less \
-                        than 50.", \
-                        default = 50)
-    parser.add_argument("-sps", "-sens_per_seed", type= int, \
-                        help = "The minimum number of potential sensors per seed graph \
+                        than 50.",
+        default=50)
+    parser.add_argument(
+        "-sps",
+        "-sens_per_seed",
+        type=int,
+        help="The minimum number of potential sensors per seed graph \
                         structure. \n This number should be increased if you\
                         are not getting enough results. (Start by increasing it to 2000, \
-                        and increase from there if you are still unsatisfied.)",\
-                        default = 500)
-    parser.add_argument("-out", "-output_file", type=str, \
-                        help = "The output file to store results.\n Results are written in CSV format.",\
-                        default = time.strftime("%Y%m%d-%H%M%S") + "-results.csv")
-    parser.add_argument("-v", "-verbose", action='store_true', \
-                        help = "Output information when each thread starts and completes operation.")
-    #TODO: Binding affinity tuning
-    #TODO: Anticipated target concentration tuning
-    
+                        and increase from there if you are still unsatisfied.)",
+        default=500)
+    parser.add_argument(
+        "-out",
+        "-output_file",
+        type=str,
+        help="The output file to store results.\n Results are written in CSV format.",
+        default=f'{time.strftime("%Y%m%d-%H%M%S")}-results.csv')
+    parser.add_argument(
+        "-v",
+        "-verbose",
+        action='store_true',
+        help="Output information when each thread starts and completes operation.")
+    # TODO: Binding affinity tuning
+    # TODO: Anticipated target concentration tuning
+
     args = parser.parse_args()
     invalidChars = re.compile('[^atgc]', re.IGNORECASE)
     if invalidChars.search(args.recSeq):
         print("Invalid recognition sequence.\nYou must enter a sequence consisisting only of a,c,t,g,A,C,T,G.")
         exit(0)
-    if args.bindingState != 0 and args.bindingState!=1:
+    if args.bindingState != 0 and args.bindingState != 1:
         print("Invalid binding state. Argument must be 0 or 1. See -h for help.")
         exit(0)
     if args.ms <= 20:
@@ -61,21 +89,29 @@ def __main__():
         exit(0)
     global verbose
     verbose = args.v
-    f = Fealden(args.recSeq.lower(), args.bindingState, args.ms, args.sps, args.out)
+    f = Fealden(
+        args.recSeq.lower(),
+        args.bindingState,
+        args.ms,
+        args.sps,
+        args.out)
+
 
 '''
     generate_sensor() generates a number of possible sensors and it returns the a list
-    of valid sensors. 
+    of valid sensors.
 
     Parameters:
         seed        <-- an object of the 'Seed' class, the seed graph for the sensor
         recSeq      <-- a String, the recognition sequence
         numPossSen  <-- an integer, the number of possible sensors to be generated
         core        <-- an integer, the ID of the core in which this process is running
-        
+
     Retuns:
         sensors     <-- list of objecfs of the class 'Sensor'
 '''
+
+
 def generate_sensor(seed, recSeq, numPossSen, core):
     global verbose
     if verbose:
@@ -85,29 +121,31 @@ def generate_sensor(seed, recSeq, numPossSen, core):
     sensors = []
     version = 0
     minScore = 0
-    
+
     while version < numPossSen:
-        version+=1
-        #build sensor from seed copy
+        version += 1
+        # build sensor from seed copy
         s = copy.deepcopy(seed)
         sen = s.build_sensor(core, version, tempdir, recSeq)
-        
-        #only keep good sensors
+
+        # only keep good sensors
         if sen is None:
             continue
         if sen.score >= minScore:
             sensors.append(sen)
-    #print sorted(sensors)
+    # print sorted(sensors)
 
     if verbose:
         print("Completed: %s, core %d" % (seed.name, core))
     return sensors
 
-'''***************************************************************************************
-Generating a Fealden object automatically runs all non-interactive parts of the program. 
-***************************************************************************************'''
-class Fealden:
 
+'''***************************************************************************************
+Generating a Fealden object automatically runs all non-interactive parts of the program.
+***************************************************************************************'''
+
+
+class Fealden:
 
     '''
         __init__() the constructor for Fealden objects. The time it takes to run the
@@ -121,45 +159,54 @@ class Fealden:
             maxSensorSize  <-- the maximum number of bases the user would like in their
                                sensor.
             minSensPerSeed <-- The minimum number of potential sensors to be generated
-                               per seed graph. 
+                               per seed graph.
         Returns:
             an object of the class Fealden
     '''
-    def __init__(self, recSeq, bindingState, maxSensorSize, minSensPerSeed, outputfile):
-        self.recSeq       = recSeq
+
+    def __init__(
+            self,
+            recSeq,
+            bindingState,
+            maxSensorSize,
+            minSensPerSeed,
+            outputfile):
+        self.recSeq = recSeq
         self.bindingState = bindingState
-        self.maxSensorSize= maxSensorSize
-        self.outputfile   = outputfile
-        f                 = open(sys.path[0] + '/' + str(bindingState) + "seedGraphs.txt")
-        seeds             = self.parse_seed_file(f.readlines())
+        self.maxSensorSize = maxSensorSize
+        self.outputfile = outputfile
+        f = open(sys.path[0] + '/' + str(bindingState) + "seedGraphs.txt")
+        seeds = self.parse_seed_file(f.readlines())
         f.close()
-        recommendedSensPerSeed   = 10*len(recSeq)*\
-                                   ((50 - maxSensorSize) if (maxSensorSize<40) else (10))
+        recommendedSensPerSeed = 10 * len(recSeq) *\
+            ((50 - maxSensorSize) if (maxSensorSize < 40) else (10))
         posSensPerSeed = minSensPerSeed
-                         #recommendedSensPerSeed if \
-                         #recommendedSensPerSeed < minSensPerSeed else minSensPerSeed
-        
+        # recommendedSensPerSeed if \
+        # recommendedSensPerSeed < minSensPerSeed else minSensPerSeed
+
         timeZero = timeit.default_timer()
-        #'''
-        numProcess        = multiprocessing.cpu_count()
-        pool              = multiprocessing.Pool(numProcess)
-        seedSensPerProcess= posSensPerSeed/numProcess
+        # '''
+        numProcess = multiprocessing.cpu_count()
+        pool = multiprocessing.Pool(numProcess)
+        seedSensPerProcess = posSensPerSeed / numProcess
 
         tasks = []
         sensors = {}
 
         i = 0
         while i < numProcess:
-            i+=1
-            tasks.extend( [ (s, self.recSeq, seedSensPerProcess, i, ) for s in seeds] )
+            i += 1
+            tasks.extend([(s, self.recSeq, seedSensPerProcess, i, )
+                          for s in seeds])
 
         for t in tasks:
-            pool.apply_async( generate_sensor, t, callback=lambda result: sensors.update([(r.seq, r) for r in result]) )
+            pool.apply_async(generate_sensor, t, callback=lambda result: sensors.update(
+                [(r.seq, r) for r in result]))
         pool.close()
         pool.join()
 
         s = sorted(sensors.values(), key=lambda sen: sen.score)
-        
+
         try:
             f = open(self.outputfile, 'w')
         except IOError:
@@ -180,11 +227,11 @@ class Fealden:
         A seed graph file looks like this:
             Seed Graph 1:   <- The following information is for the first seed graph
             2               <- The name of the node which will contain the recognition seq
-            2 1 3 3 5       
+            2 1 3 3 5
             3 2 2
             5 2 4
             4 5 7 7 0
-            7 4 4 
+            7 4 4
             Seed Graph 2:
             4
             1 0 2
@@ -210,32 +257,35 @@ class Fealden:
         Reutrns:
             seeds <-- a list of objects of the class "Seed"
     '''
+
     def parse_seed_file(self, lines):
         seeds = []
         i = 0
-        l = lines[i]
+        li = lines[i]
         seedNum = 0
         while i < (len(lines)):
-            i+=1
-            l = lines[i]
+            i += 1
+            li = lines[i]
             graphData = []
             recNodeName = '-1'
-            seedNum +=1
-            while i <(len(lines)) and lines[i].split()[0] != "Seed" :
-                l = lines[i].strip()
-                if len(l) == 1 :
-                    recNodeName = l
-                    i+=1
+            seedNum += 1
+            while i < (len(lines)) and lines[i].split()[0] != "Seed":
+                li = lines[i].strip()
+                if len(li) == 1:
+                    recNodeName = li
+                    i += 1
                     continue
-                graphData.append(l)
-                i +=1
-            seeds.append(seed.Seed(graphData, recNodeName, self.recSeq, \
-                                   self.bindingState, str("Graph " +  str(seedNum)), self.maxSensorSize))
+                graphData.append(li)
+                i += 1
+            seeds.append(
+                seed.Seed(
+                    graphData, recNodeName, self.recSeq, self.bindingState, str(
+                        "Graph " + str(seedNum)), self.maxSensorSize))
         return seeds
 
-#run the program from the command line        
+
+# run the program from the command line
 if __name__ == "__main__":
     tempdir = tempfile.mkdtemp()
     __main__()
     shutil.rmtree(tempdir)
-
