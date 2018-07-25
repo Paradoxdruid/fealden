@@ -5,7 +5,7 @@ import random, time, os, subprocess, sys
 RNA_PATH = '/path/to/RNAstructure'
 
 sys.path.append(f'{RNA_PATH}/exe')
-os.environ['DATAPATH']='{}/data_tables'.format(RNA_PATH)
+os.environ['DATAPATH']=f'{RNA_PATH}/data_tables'
 import RNAstructure
 
 class Seed:
