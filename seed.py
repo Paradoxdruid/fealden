@@ -2,13 +2,11 @@ import sensor, node, fold
 
 import random, time, os, subprocess, sys
 
-RNA_PATH = '/Users/abonham/Downloads/RNAstructure'
+RNA_PATH = '/path/to/RNAstructure'
+
 sys.path.append(f'{RNA_PATH}/exe')
 os.environ['DATAPATH']='{}/data_tables'.format(RNA_PATH)
 import RNAstructure
-
-command = ['hybrid-ss-min','-n','DNA','--tmin=25', '--tmax=25',
-           '--sodium=0.15', '--magnesium=0.005','--mfold=50,-1,100']
 
 class Seed:
     '''
