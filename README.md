@@ -9,9 +9,13 @@
 
 -------------------------
 
+### Dependencies
+
 **Fealden** depends upon the excellent [RNAstructure package](https://rna.urmc.rochester.edu/RNAstructure.html) from the Mathews Lab, and is written for [Python 3](https://www.python.org/).  
 
 ------------------------
+
+### Usage
 
 To use **Fealden**:
 `python ./fealden.py "TATATAA" 1`
@@ -22,4 +26,8 @@ To use **Fealden**:
 
 ----------------------
 
-**Fealden** is developed as academic software by the [Bonham Lab](http://www.bonhamlab.com) and Dr. Andrew J. Bonham at the [Metropolitan State University of Denver](http://www.msudenver.edu).  It is licensed under the LGPL v3.0.
+### Authors
+
+**Fealden** is developed as academic software by the [Bonham Lab](http://www.bonhamlab.com) and Dr. Andrew J. Bonham at the [Metropolitan State University of Denver](http://www.msudenver.edu).  It is licensed under the LGPL v3.0.  
+
+Contributors include: Dr. Andrew J. Bonham (initial and ongoing development), Jody Stephens (early implementation), Becky Addison (earl implementation), Aviva Bulow (code rewrite and current approach), and Austin Haider (further development).
