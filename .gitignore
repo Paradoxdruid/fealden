@@ -9,6 +9,10 @@ __pycache__/
 # Output files
 *.csv
 
+# OS files
+.DS_store
+.vscode/
+
 # Distribution / packaging
 .Python
 build/
