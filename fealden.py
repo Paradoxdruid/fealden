@@ -18,6 +18,52 @@ BINDING_STATE = {'DS': 0, 'SS': 1}
 tempdir = 'tmp'
 verbose = False
 
+# Set seed graph patterns from literature
+SEED_GRAPHS = {
+    0 : ['Seed Graph 1:',
+'2',
+'1 0 2',
+'2 1 3 3 5',
+'3 2 2',
+'5 2 0',
+'Seed Graph 2:',
+'2',
+'1 0 2',
+'2 1 3 3 0',
+'3 2 2',
+'Seed Graph 3:',
+'4',
+'1 0 2',
+'2 1 3 7 9',
+'3 2 4',
+'4 3 5 5 7',
+'5 4 4',
+'7 4 2',
+'9 2 0'
+],
+    1 : ['Seed Graph 1:',
+'5',
+'1 0 2',
+'2 1 3 3 5',
+'3 2 2',
+'5 2 0',
+'Seed Graph 2:',
+'7',
+'2 1 3 11 0',
+'3 2 4',
+'4 3 5 5 7',
+'5 4 4',
+'7 4 6',
+'6 7 9 9 11',
+'9 6 6',
+'11 6 2',
+'Seed Graph 3:',
+'3',
+'1 0 2',
+'2 1 3 3 0',
+'3 2 2']
+}
+
 '''
     __main__() begins the program, parses, and validates the command line arguments.
     The program is run by typing "python ./fealden.py STRING INT' where:
@@ -89,7 +135,7 @@ def __main__():
         exit(0)
     global verbose
     verbose = args.v
-    f = Fealden(
+    Fealden(
         args.recSeq.lower(),
         args.bindingState,
         args.ms,
@@ -175,12 +221,16 @@ class Fealden:
         self.bindingState = bindingState
         self.maxSensorSize = maxSensorSize
         self.outputfile = outputfile
-        f = open(sys.path[0] + '/' + str(bindingState) + "seedGraphs.txt")
-        seeds = self.parse_seed_file(f.readlines())
-        f.close()
-        recommendedSensPerSeed = 10 * len(recSeq) *\
-            ((50 - maxSensorSize) if (maxSensorSize < 40) else (10))
+
+        # Pulled seed file constructs into program to reduce file reads and
+        # remove file dependencies
+        seeds = self.parse_seed_file(SEED_GRAPHS[int(bindingState)])
+
+        # recommendedSensPerSeed = 10 * len(recSeq) *\
+        #     ((50 - maxSensorSize) if (maxSensorSize < 40) else (10))
         posSensPerSeed = minSensPerSeed
+
+        # FIXME: Implement recommendedSensPerSeed
         # recommendedSensPerSeed if \
         # recommendedSensPerSeed < minSensPerSeed else minSensPerSeed
 
