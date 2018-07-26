@@ -1,8 +1,0 @@
-{
-    "python.pythonPath": "/anaconda3/bin/python3",
-    "spellright.language": "en",
-    "spellright.documentTypes": [
-        "latex",
-        "plaintext"
-    ]
-}
