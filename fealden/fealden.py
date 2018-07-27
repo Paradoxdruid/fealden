@@ -15,7 +15,6 @@ import shutil
 import tempfile
 # added os.system and sys
 BINDING_STATE = {'DS': 0, 'SS': 1}
-tempdir = 'tmp'
 verbose = False
 
 # Set seed graph patterns from literature
@@ -163,7 +162,6 @@ def generate_sensor(seed, recSeq, numPossSen, core):
     if verbose:
         print("Starting: %s, core %d" % (seed.name, core))
 
-    global tempdir
     sensors = []
     version = 0
     minScore = 0
@@ -172,7 +170,7 @@ def generate_sensor(seed, recSeq, numPossSen, core):
         version += 1
         # build sensor from seed copy
         s = copy.deepcopy(seed)
-        sen = s.build_sensor(core, version, tempdir, recSeq)
+        sen = s.build_sensor(core, version, recSeq)
 
         # only keep good sensors
         if sen is None:
@@ -336,6 +334,4 @@ class Fealden:
 
 # run the program from the command line
 if __name__ == "__main__":
-    tempdir = tempfile.mkdtemp()
     __main__()
-    shutil.rmtree(tempdir)
