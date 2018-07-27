@@ -1,11 +1,19 @@
 from . import sensor, node, fold
 
-import random, time, os, subprocess, sys
+import random
+import time
+import os
+import subprocess
+import sys
+import configparser
 
-RNA_PATH = '/Users/abonham/Downloads/RNAstructure'
+dir_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+config = configparser.ConfigParser()
+config.read(os.path.join(dir_path,'config.ini'))
+RNA_PATH = config['RNAstructure']['Path']
 
-sys.path.append(f'{RNA_PATH}/exe')
-os.environ['DATAPATH']=f'{RNA_PATH}/data_tables'
+sys.path.append(os.path.join(RNA_PATH,'exe'))
+os.environ['DATAPATH']=os.path.join(RNA_PATH,'data_tables')
 import RNAstructure
 
 class Seed:
@@ -165,12 +173,11 @@ class Seed:
             version  <-- An integer, the number of the sensor being built on this seed.
                          (ie. if this is the 1047th sensor built by processor 3 from seed
                           graph number 4: core = 3 and version = 1047).
-            tempdir  <-- A string, the name of the temporary directory where unafold
-                         files should be stored
+
         Returns:
             a Sensor object
     '''
-    def build_sensor(self, core, version, tempdir, baseSeq):
+    def build_sensor(self, core, version, baseSeq):
         rand = random.Random()
         self.generate_node_sizes(rand)
         self.populate_nodes(rand)
