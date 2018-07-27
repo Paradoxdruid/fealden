@@ -1,4 +1,4 @@
-import sensor, node, fold
+from . import sensor, node, fold
 
 import random, time, os, subprocess, sys
 

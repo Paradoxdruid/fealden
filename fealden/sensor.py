@@ -1,4 +1,4 @@
-import fold as f
+from . import fold as f
 
 ''' ---------------------------------------------------------------
     Sensor is a structure to hold and interperate the results from
@@ -70,7 +70,7 @@ class Sensor:
         (seq, structureData) = self.simplify_input(lines)
         folds = []
 
-        for i, v in enumerate(structureData):
+        for v in structureData:
             fold = f.Fold(v['bps'], v['deltaG'], self.recSeq)
             folds.append(fold)
 

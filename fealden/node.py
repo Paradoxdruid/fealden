@@ -1,4 +1,4 @@
-import fold as f
+from . import fold as f
 
 '''
 Node is the class from which DSNode and SSNode inherit. It is a convenient place for

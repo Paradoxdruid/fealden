@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-import seed
+from . import seed
 import multiprocessing
 import copy
-import sensor
+from . import sensor
 import os
 import timeit
 import time
