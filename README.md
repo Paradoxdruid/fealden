@@ -14,7 +14,7 @@
 ### Usage
 
 To use **Fealden**:
-`python ./fealden.py "TATATAA" 1`
+`fealden "TATATAA" 1`
 
 (Where `"TATATAA"` is the input binding/recognition element (such as an aptamer), and `1` indicates whether the binding element is predominantly single-stranded (0) or double-stranded (1) in the binding-active state.)
 
