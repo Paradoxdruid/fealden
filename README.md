@@ -7,7 +7,9 @@
 
 ### Dependencies
 
-**Fealden** depends upon the excellent [RNAstructure package](https://rna.urmc.rochester.edu/RNAstructure.html) from the Mathews Lab, and is written for [Python 3](https://www.python.org/).  
+**Fealden** depends upon the excellent [RNAstructure package](https://rna.urmc.rochester.edu/RNAstructure.html) from the Mathews Lab, and is written for [Python 3.6+](https://www.python.org/).  
+
+Before use, put the path to the installed RNAstructure package in `config.ini`.
 
 ------------------------
 
