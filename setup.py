@@ -11,6 +11,7 @@ setup(
     license='LGPL v3.0',
     scripts=['bin/fealden'],
     include_package_data=True,
+    package_data={'fealden': ['config.ini','../README.md']},
     description='Tool for generating optimized nucleic acid biosensor sequences',
     long_description=open('README.md').read(),
 )
