@@ -7,14 +7,18 @@ import subprocess
 import sys
 import configparser
 
-dir_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+dir_path = os.path.dirname(os.path.abspath(__file__))
 config = configparser.ConfigParser()
 config.read(os.path.join(dir_path,'config.ini'))
 RNA_PATH = config['RNAstructure']['Path']
 
-sys.path.append(os.path.join(RNA_PATH,'exe'))
-os.environ['DATAPATH']=os.path.join(RNA_PATH,'data_tables')
-import RNAstructure
+try:
+    sys.path.append(os.path.join(RNA_PATH,'exe'))
+    os.environ['DATAPATH']=os.path.join(RNA_PATH,'data_tables')
+    import RNAstructure
+except Exception as error:
+    print("RNAstructure could not be found; check config.ini")
+    print(error)
 
 class Seed:
     '''

@@ -10,6 +10,7 @@ setup(
     version='0.1',
     license='LGPL v3.0',
     scripts=['bin/fealden'],
+    include_package_data=True,
     description='Tool for generating optimized nucleic acid biosensor sequences',
     long_description=open('README.md').read(),
 )
