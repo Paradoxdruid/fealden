@@ -63,7 +63,9 @@ SEED_GRAPHS = {
 '3 2 2']
 }
 
-'''
+
+def __main__():
+    '''
     __main__() begins the program, parses, and validates the command line arguments.
     The program is run by typing "python ./fealden.py STRING INT' where:
         STRING is a string, in quotes, which consists of A, T, C, G, a, c, t, or g
@@ -75,10 +77,7 @@ SEED_GRAPHS = {
         None
     Returns:
         Nothing
-'''
-
-
-def __main__():
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument("recSeq", type=str,
                         help="The sequenced recognized by your target \
@@ -142,7 +141,9 @@ def __main__():
         args.out)
 
 
-'''
+
+def generate_sensor(seed, recSeq, numPossSen, core):
+    '''
     generate_sensor() generates a number of possible sensors and it returns the a list
     of valid sensors.
 
@@ -154,10 +155,7 @@ def __main__():
 
     Retuns:
         sensors     <-- list of objecfs of the class 'Sensor'
-'''
-
-
-def generate_sensor(seed, recSeq, numPossSen, core):
+    '''
     global verbose
     if verbose:
         print("Starting: %s, core %d" % (seed.name, core))
@@ -270,7 +268,9 @@ class Fealden:
         print("Stored " + str(len(s)) + " result(s) in " + self.outputfile)
         print("Took " + str(timeit.default_timer() - timeZero) + " seconds")
 
-    '''
+
+    def parse_seed_file(self, lines):
+        '''
         parse_seed_file() is a simple method for parsing the seedGraph file.
         A seed graph file looks like this:
             Seed Graph 1:   <- The following information is for the first seed graph
@@ -304,9 +304,8 @@ class Fealden:
 
         Reutrns:
             seeds <-- a list of objects of the class "Seed"
-    '''
-
-    def parse_seed_file(self, lines):
+        '''
+        
         seeds = []
         i = 0
         li = lines[i]

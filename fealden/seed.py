@@ -52,7 +52,8 @@ class Seed:
         self.maxSensorSize = maxSensorSize
         self.make_graph(initData, self.head, self.nodes, recNodeName, recSeq)
 
-    '''
+    def make_graph(self, data, current, nodes, recNodeName, recSeq):
+        '''
         make_graph() uses the seed graph data to construct the graph. The data looks like
         this:
             [2 1 3 3 5,     <- This line represents the data for one node
@@ -119,8 +120,8 @@ class Seed:
 
         Returns:
             Nothing
-    '''
-    def make_graph(self, data, current, nodes, recNodeName, recSeq):
+        '''
+
         firstNodeData = data[0].split()
         if int(firstNodeData[0]) % 2 == 0:
             current.set_length(0)
@@ -136,10 +137,10 @@ class Seed:
             nodes[firstNodeData[2]] = current
             self.build_the_rest(data[1:], nodes)
 
-    '''
-    build_the_rest() is an auxiliary function of make_graph.
-    '''
     def build_the_rest(self, data, nodes):
+        '''
+        build_the_rest() is an auxiliary function of make_graph.
+        '''
         if not data:
             #The list "data" is empty, we are out of data
             return
@@ -164,7 +165,8 @@ class Seed:
         current.set_links(links)
         self.build_the_rest(data[1:], nodes)
 
-    '''
+    def build_sensor(self, core, version, baseSeq):
+        '''
         build_sensor() first builds a 'Sensor' sequence using the 'Seed' of 'self'
         and an object of the 'random.Random' class. The sensor sequence is
         constructed. In some cases the seed graph may require the use of more bases
@@ -180,8 +182,7 @@ class Seed:
 
         Returns:
             a Sensor object
-    '''
-    def build_sensor(self, core, version, baseSeq):
+        '''
         rand = random.Random()
         self.generate_node_sizes(rand)
         self.populate_nodes(rand)
@@ -227,7 +228,8 @@ class Seed:
 
         return sen
 
-    '''
+    def generate_node_sizes(self, rand):
+        '''
         generate_node_sizes() semi-randomly determines the size of the sensor, based on
         this number, a size for each node which represets physical DNA is assigned. Each
         node is given a minimum length of three bases or three base-pairs, depending on
@@ -244,8 +246,7 @@ class Seed:
 
         Returns:
             Nothing
-    '''
-    def generate_node_sizes(self, rand):
+        '''
         self.nodes[self.recNodeName].set_length(len(self.recSeq)) #min len of node with recSeq
         #print "rec seq node len is " + str(self.nodes[self.recNodeName].get_length())
         MAX_SIZE = self.maxSensorSize
@@ -294,8 +295,8 @@ class Seed:
             (n, s) = realNodes[r]
             n.set_length(s)
             
-        
-    '''
+    def populate_nodes(self, rand):
+        '''
         populate_nodes() populates the empty nodes with DNA bases (ie. A, C, T, or G)
         this method requires that all nodes, which are not None, have a length.
 
@@ -303,8 +304,7 @@ class Seed:
             rand    <-- a pointer to an object of a class from the module 'random'
         Returns:
             Nothing
-    '''
-    def populate_nodes(self, rand):
+        '''
         for n in self.nodes.values():
             if n == None:
                 continue
@@ -334,9 +334,9 @@ class Seed:
             else: #this node does not contain the recognition sequence
                 seq = self.generate_rand_DNA_string(length, rand)
             n.set_seq(seq)
-
-        
-    '''
+     
+    def generate_rand_DNA_string(self, size, rand):
+        '''
         generate_rand_DNA_string() generates a list of pseudo-randomly selected
         DNA bases (ie. A, C, T, or G) of a specified size.
 
@@ -346,13 +346,13 @@ class Seed:
 
         Returns:
             a list of random DNA letters
-    '''        
-    def generate_rand_DNA_string(self, size, rand):
+        '''   
         if size ==0:
             return []
         return [ rand.choice(['A', 'T', 'C', 'G']) for i in range(0, size) ]
 
-    '''
+    def get_sequence(self):
+        '''
         get_sequence() returns the sequence represented by the populated nodes of
         the seed graph up to a given node. If the nodes are not populated, the function
         will return an empty sequence.
@@ -362,8 +362,7 @@ class Seed:
         Returns:
             A string. The sequence that was constructed using this seed graph. 
 
-    '''
-    def get_sequence(self):
+        '''
         prev = self.head
         (sequence, current) = prev.get_seq_and_next_node(None, 0)
 

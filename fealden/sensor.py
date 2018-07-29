@@ -1,6 +1,9 @@
 from . import fold as f
 
-''' ---------------------------------------------------------------
+
+class Sensor:
+    '''
+    ---------------------------------------------------------------
     Sensor is a structure to hold and interperate the results from
     a unafold query, along with some other information. A Sensor
     object has a sequence, a recognition sequence and
@@ -8,11 +11,16 @@ from . import fold as f
     a tagging location, the desired state of the recognition
     sequence, the name of the seed graph that gave rise to
     this sensor, and an overall score.
------------------------------------------------------------------'''
-
-
-class Sensor:
+    -----------------------------------------------------------------
     '''
+
+    def __init__(self, dataFile,
+                 recSeq,
+                 respSeq,
+                 desRecSeqState,
+                 seedName,
+                 baseSeq):
+        '''
         This is the constructor for Sensor.
         Paramaters:
                     dataFile <- a File object (this should be the .ct
@@ -31,14 +39,7 @@ class Sensor:
                                 0 represents double stranded, 1 represents single stranded.
                     seedName <- An integer, this is a simple tag to represent which
                                 graph gave rise to this sensor.
-    '''
-
-    def __init__(self, dataFile,
-                 recSeq,
-                 respSeq,
-                 desRecSeqState,
-                 seedName,
-                 baseSeq):
+        '''
         self.seedName = seedName
         self.recSeq = recSeq
         self.respSeq = respSeq
@@ -53,7 +54,9 @@ class Sensor:
         self.baseSeq = baseSeq
         (self.tagLoc, self.score) = self.get_tag_and_score()
 
-    '''
+
+    def interperate_data(self, lines):
+        '''
         interperate_data takes data from a the .ct file which has
         been parsed into a list of lines. It returns a tuple.
         The first value is the sequence, represented as a string
@@ -64,9 +67,7 @@ class Sensor:
         Returns:
             (seq, folds) <-- the tuple described above.
 
-    '''
-
-    def interperate_data(self, lines):
+        '''
         (seq, structureData) = self.simplify_input(lines)
         folds = []
 
@@ -76,7 +77,8 @@ class Sensor:
 
         return (seq, folds)
 
-    '''
+    def simplify_input(self, lines):
+        '''
         simplify_input takes the .ct file, represented as as list
         of lines, and distills from it the information we care
         about into a useable form. The information returned is
@@ -115,9 +117,7 @@ class Sensor:
             lines <-- a list of lines from the .ct file
         Returns:
             (sequence, stuructureData) -- the tuple described above
-    '''
-
-    def simplify_input(self, lines):
+        '''
         structureData = []
         foldIndex = -1
         foldSize = int(lines[0].split()[0])
@@ -142,7 +142,8 @@ class Sensor:
                     sequence.append(temp[1])
         return ("".join(sequence).lower(), structureData)
 
-    '''
+    def get_tag_and_score(self):
+        '''
         get_tag_and_score returns a number for the sensor, based on an arbitrary fitness
         scale, this serves as a proxy for our estimation of how well the sensor
         will work. The greater the number, the higher the estimation of the
@@ -155,9 +156,7 @@ class Sensor:
             A tuple, (x,y). x is an integer, the location on the sensor's sequence upon
             upon which the tag should be placed. y is a floating point number, the score
             of the sensor.
-    '''
-
-    def get_tag_and_score(self):
+        '''
         # print 'in get_score()'
         DELTA_G_MAX_DIFFERENCE = 5
         if len(self.folds) <= 1:
@@ -196,7 +195,9 @@ class Sensor:
         return (self.tagLoc, (1 - abs(self.onConc - self.offConc) /
                               (self.onConc + self.offConc)) * self.onToOffDist)
 
-    '''
+
+    def get_tagging_information(self):
+        '''
         get_tagging_information() finds the optimal tagging situation, and returns some
         information with which it is associated. The information returned is labeled in
         the "Returns:" section below and should be interperated as follows:
@@ -223,9 +224,7 @@ class Sensor:
 
         Returns:
             (position, onConc, offConc, noiseConc, concWrong, concFuzzy, weightedAvgOnToOffDist)
-    '''
-
-    def get_tagging_information(self):
+        '''
         # print  "In get_tagging_information()"
         MAX_ON_DIST = 12
         MIN_OFF_CHANGE = 10
@@ -341,7 +340,9 @@ class Sensor:
         # print scoreData
         return scoreData
 
-    '''
+    @staticmethod
+    def csv_header():
+        '''
         csv_header() generates the header to a CSV (comma separated values) file that
         describes the values returned by csv_line().
 
@@ -350,9 +351,7 @@ class Sensor:
         Returns:
             A string, the comma delimited header for a CSV file containing information
             about sensors.
-    '''
-    @staticmethod
-    def csv_header():
+        '''
         return ",".join(["Sequence",
                          "Score",
                          "Seed Name",
@@ -368,7 +367,9 @@ class Sensor:
                          "Num Folds",
                          "Original Sequence"])
 
-    '''
+
+    def csv_line(self):
+        '''
         csv_line() generates a string representing this sensor, which can be inserted
         into a CSV (comma separated values) file.
 
@@ -376,9 +377,7 @@ class Sensor:
             None
         Returns:
             A string, the string representation of a sensor, comma delimited.
-    '''
-
-    def csv_line(self):
+        '''
         return ",".join([self.seq,
                          str(self.score),
                          self.seedName,
@@ -394,7 +393,9 @@ class Sensor:
                          str(len(self.folds)),
                          self.baseSeq])
 
-    '''
+
+    def __repr__(self):
+        '''
         __repr__() generates the string representation of a sensor. It is essentially all
         the information one might want to know about a sensor.
 
@@ -403,21 +404,17 @@ class Sensor:
             None
         Returns:
             A string, the string representation of a sensor.
-    '''
-
-    def __repr__(self):
         '''
-        return str("\n\nSequence: " + self.seq +\
-                   "\nScore: " + str(self.score) + \
-                   "\nSeed Name: " + self.seedName + \
-                   "\nTag Location: " + str(self.tagLoc) +\
-                   "\nConc On: " + str(self.onConc) +\
-                   "\nConc Off: " + str(self.offConc) + \
-                   "\nConc Noise: " +  str(self.noiseConc) + \
-                   "\nConc Wrong: " + str(self.wrongConc) + \
-                   "\nConc Fuzzy: " + str(self.fuzzyConc) + \
-                   "\nOn to Off Dist: " + str(self.onToOffDist) +\
-                   "\nLength: " + str(len(self.seq))+ \
-                   "\nNum Folds: " + str(len(self.folds)))
-        '''
+        # return str("\n\nSequence: " + self.seq +\
+        #            "\nScore: " + str(self.score) + \
+        #            "\nSeed Name: " + self.seedName + \
+        #            "\nTag Location: " + str(self.tagLoc) +\
+        #            "\nConc On: " + str(self.onConc) +\
+        #            "\nConc Off: " + str(self.offConc) + \
+        #            "\nConc Noise: " +  str(self.noiseConc) + \
+        #            "\nConc Wrong: " + str(self.wrongConc) + \
+        #            "\nConc Fuzzy: " + str(self.fuzzyConc) + \
+        #            "\nOn to Off Dist: " + str(self.onToOffDist) +\
+        #            "\nLength: " + str(len(self.seq))+ \
+        #            "\nNum Folds: " + str(len(self.folds)))
         return self.csv_line()

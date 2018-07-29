@@ -4,9 +4,6 @@ import math
 
 
 class Fold:
-    # the states a sequence can be in
-    SEQ_STATE = {"DS": 0, "SS": 1, "MIXED": 3}
-    RT = 8.3144598 * (1.0 / 4184.0) * 298.0
     '''
         The constructor for Fold.
 
@@ -17,6 +14,9 @@ class Fold:
             recSeq      <- a string, the recognition sequence
 
     '''
+    # the states a sequence can be in
+    SEQ_STATE = {"DS": 0, "SS": 1, "MIXED": 3}
+    RT = 8.3144598 * (1.0 / 4184.0) * 298.0
 
     def __init__(self, foldData, deltaG, recSeq):
         self.head = node.SSNode(None)
@@ -29,7 +29,9 @@ class Fold:
         self.recSeq = recSeq
         self.recSeqState = self.get_rec_seq_state()
 
-    '''
+
+    def construct_graph_SSNode(self, currentNode, currentIndex):
+        '''
         consturuct_graph_SSNode is the algorithem for constructing the
         fold graph given that the current node is an SSNode.
 
@@ -38,9 +40,7 @@ class Fold:
             currentIndex <- the index in self.graphData which we're currently at.
         Returns:
             Nothing
-    '''
-
-    def construct_graph_SSNode(self, currentNode, currentIndex):
+        '''
         currentNode.set_start(currentIndex + 1)
         isLastNode = True
         length = 0
@@ -66,7 +66,10 @@ class Fold:
                 break
         if isLastNode:
             currentNode.set_length(length)
-    '''
+
+
+    def construct_graph_DSNode_strand1(self, currentNode, currentIndex):
+        '''
         construct_graph_DSNode_strand1 is the algorithem for building a
         DSNode into the graph given that the base pairs in the DSNode that
         we're processing are all on the "first" strand of the DSNode. (ie
@@ -78,9 +81,7 @@ class Fold:
             currentIndex    <- the index in the self.foldData that we're currently on
         Returns:
             Nothing
-    '''
-
-    def construct_graph_DSNode_strand1(self, currentNode, currentIndex):
+        '''
         currentNode.set_strand1Start(currentIndex + 1)
         prevPair = self.foldData[currentIndex][1] + 1
         for i, v in enumerate(self.foldData[currentIndex::]):
@@ -95,7 +96,10 @@ class Fold:
                 currentNode.set_midSSNode1(nextNode)
 
                 break
-    '''
+
+    def construct_graph_DSNode_strand2(
+            self, currentNode, currentIndex, prevNode):
+        '''
         construct_graph_DSNode_strand2 is the algorithem for building a
         DSNode into the graph given that the base pairs in the DSNode that
         we're processing are all on the "second" strand of the DSNode. (ie
@@ -108,10 +112,7 @@ class Fold:
             prevNode        <- the last SSNode we've worked on
         Returns:
             Nothing
-    '''
-
-    def construct_graph_DSNode_strand2(
-            self, currentNode, currentIndex, prevNode):
+        '''
         currentNode.set_strand2Start(currentIndex + 1)
         currentNode.set_midSSNode2(prevNode)
         prevPair = self.foldData[currentIndex][1] + 1
@@ -129,7 +130,9 @@ class Fold:
                 # 1
                 break
 
-    '''
+
+    def get_distance(self, index1, index2):
+        '''
         get_distance (is a proper distance metric which) captures the approximate spacial
         distance between two base pairs
 
@@ -138,9 +141,7 @@ class Fold:
             secondIndex <- an integer, the index of the second bp (the larger index)
         Returns:
             distance   <- an integer, the calculated distance
-    '''
-
-    def get_distance(self, index1, index2):
+        '''
         if index1 > index2:
             # TODO: Double-check this implementation
             # temp = index1
@@ -162,7 +163,9 @@ class Fold:
             if tempDist < dist:
                 dist = tempDist
         return dist
-    '''
+
+    def get_dist_to_index(self, index, traversed, previous, current):
+        '''
         get_dist_to_index() gets the distance from the start of the current
         node to the base pair at the index referenced.
 
@@ -173,9 +176,7 @@ class Fold:
             previous    <- the node most recently traversed
             current     <- the node being traversed
 
-    '''
-
-    def get_dist_to_index(self, index, traversed, previous, current):
+        '''
         if current is None:  # reached end and have not found index
             return sys.maxsize
         if current.contains(index):
@@ -193,7 +194,9 @@ class Fold:
 
         return dist
 
-    '''
+
+    def get_rec_seq_state(self):
+        '''
         get_rec_seq_state() gets the state (ie DS, SS, or Mixed) into which the recognition
         sequence has folded.
 
@@ -201,9 +204,7 @@ class Fold:
             none
         Returns:
             the state  <- an item from the Fold.SEQ_STATE list.
-    '''
-
-    def get_rec_seq_state(self):
+        '''
         recSeqPtrList = self.ptrList[self.recSeq["start"] -
                                      1:self.recSeq['end'] - 1]
         assert recSeqPtrList != []
