@@ -107,6 +107,11 @@ def __main__():
                         and increase from there if you are still unsatisfied.)",
         default=500)
     parser.add_argument(
+        "-i",
+        "--interactive",
+        action='store_true',
+        help="Interactive Mode, no file output")
+    parser.add_argument(
         "-out",
         "-output_file",
         type=str,
@@ -138,6 +143,7 @@ def __main__():
         args.bindingState,
         args.ms,
         args.sps,
+        args.interactive,
         args.out)
 
 
@@ -195,13 +201,16 @@ class Fealden:
         To run this method sequentially, uncomment the 8th line in the method body.
 
         Parameters:
-            recSeq         <-- a String, the recognition sequence.
+            recSeq         <-- a string, the recognition sequence.
             bindingState   <-- an integer, 0 or 1, representing the binding state of the
                                recognition sequence.
-            maxSensorSize  <-- the maximum number of bases the user would like in their
-                               sensor.
-            minSensPerSeed <-- The minimum number of potential sensors to be generated
-                               per seed graph.
+            maxSensorSize  <-- an integer, the maximum number of bases the user would like
+                               in their sensor.
+            minSensPerSeed <-- an integer, the minimum number of potential sensors to be
+                               generated per seed graph.
+            interactive    <-- a bool, enable interactive mode to store results in output
+                               attribute, rather than write to a csv file.
+            outputfile     <-- a string, filename to store results in.
         Returns:
             an object of the class Fealden
     '''
@@ -212,6 +221,7 @@ class Fealden:
             bindingState,
             maxSensorSize,
             minSensPerSeed,
+            interactive,
             outputfile):
         self.recSeq = recSeq
         self.bindingState = bindingState
@@ -253,21 +263,27 @@ class Fealden:
 
         s = sorted(sensors.values(), key=lambda sen: sen.score)
 
-        try:
-            f = open(self.outputfile, 'w')
-        except IOError:
-            print("Unable to open " + self.outputfile)
-            self.outputfile = "recent-results.csv"
-            f = open(self.outputfile, 'w')
+        if not interactive:
+            try:
+                f = open(self.outputfile, 'w')
+            except IOError:
+                print("Unable to open " + self.outputfile)
+                self.outputfile = "recent-results.csv"
+                f = open(self.outputfile, 'w')
 
-        f.write(sensor.Sensor.csv_header() + '\n')
-        for sen in s:
-            f.write(str(sen) + '\n')
-        f.close()
+            f.write(sensor.Sensor.csv_header() + '\n')
+            for sen in s:
+                f.write(str(sen) + '\n')
+            f.close()
 
-        print("Stored " + str(len(s)) + " result(s) in " + self.outputfile)
-        print("Took " + str(timeit.default_timer() - timeZero) + " seconds")
-
+            print("Stored " + str(len(s)) + " result(s) in " + self.outputfile)
+            print("Took " + str(timeit.default_timer() - timeZero) + " seconds")
+        else:
+            output_list = []
+            output_list.append(sensor.Sensor.csv_header())
+            for sen in s:
+                output_list.append(str(sen))
+            self.output = output_list
 
     def parse_seed_file(self, lines):
         '''
