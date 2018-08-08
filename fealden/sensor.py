@@ -1,5 +1,4 @@
-from . import fold as f
-
+from . import fold
 
 class Sensor:
     '''
@@ -55,7 +54,7 @@ class Sensor:
         (self.tagLoc, self.score) = self.get_tag_and_score()
 
 
-    def interperate_data(self, lines):
+    def interperate_data(self, data):
         '''
         interperate_data takes data from a the .ct file which has
         been parsed into a list of lines. It returns a tuple.
@@ -63,17 +62,24 @@ class Sensor:
         of lowercase letters. The second value is a list of Folds.
 
         Parameters:
-            lines   <-- A list of lines from the .ct file output by unafold.
+            data   <-- A list of lines from the .ct file output by unafold.
         Returns:
             (seq, folds) <-- the tuple described above.
 
         '''
-        (seq, structureData) = self.simplify_input(lines)
+        seq, structureData = data[0], data[1]
+        # (seq, structureData) = self.simplify_input(lines)
         folds = []
 
-        for v in structureData:
-            fold = f.Fold(v['bps'], v['deltaG'], self.recSeq)
-            folds.append(fold)
+        # for v in structureData:
+        #     fold = f.Fold(v['bps'], v['deltaG'], self.recSeq)
+        #     folds.append(fold)
+        for each in structureData:
+            # print(i,v)
+            # print(f'fold inputs: {v[str(bps)]}, {v[str(deltaG)]}, {self.recSeq}')
+            this_fold = fold.Fold(each['bps'], each['deltaG'], self.recSeq)
+            folds.append(this_fold)
+            # blah = [i.foldData for i in folds]
 
         return (seq, folds)
 

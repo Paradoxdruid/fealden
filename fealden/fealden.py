@@ -13,7 +13,7 @@ import random
 import sys
 import shutil
 import tempfile
-# added os.system and sys
+
 BINDING_STATE = {'DS': 0, 'SS': 1}
 verbose = False
 

@@ -1,4 +1,4 @@
-from . import fold as f
+from . import fold
 
 
 class Node():
@@ -133,7 +133,7 @@ class DSNode(Node):
         self.upstreamSSNode = prog
 
     def get_state(self):  # replace with get_type()
-        return f.Fold.SEQ_STATE["DS"]
+        return fold.Fold.SEQ_STATE["DS"]
 
     def get_rec_seq_data(self):
         # print 'getting data, node size is ' + str(self.length)
@@ -348,7 +348,7 @@ class SSNode(Node):
         self.upstreamDSNode = prog
 
     def get_state(self):
-        return f.Fold.SEQ_STATE["SS"]
+        return fold.Fold.SEQ_STATE["SS"]
 
     def get_rec_seq_data(self):
         recSeqSize = self.length - \

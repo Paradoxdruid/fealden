@@ -1,24 +1,10 @@
-from . import sensor, node, fold
-
+from . import sensor, node, fold, structure
 import random
 import time
 import os
 import subprocess
 import sys
 import configparser
-
-dir_path = os.path.dirname(os.path.abspath(__file__))
-config = configparser.ConfigParser()
-config.read(os.path.join(dir_path,'config.ini'))
-RNA_PATH = config['RNAstructure']['Path']
-
-try:
-    sys.path.append(os.path.join(RNA_PATH,'exe'))
-    os.environ['DATAPATH']=os.path.join(RNA_PATH,'data_tables')
-    import RNAstructure
-except Exception as error:
-    print("RNAstructure could not be found; check config.ini")
-    print(error)
 
 class Seed:
     '''
@@ -194,37 +180,10 @@ class Seed:
             
         (leadingRecDat, laggingRecDat) = self.nodes[self.recNodeName].get_rec_seq_data()
         
-        # Create an equivalent RNSAstructure object and then create a virtual ct file as list
-
-        rna_obj = RNAstructure.RNA.fromString(seq, backbone='dna')
-        rna_obj.FoldSingleStrand(percent=15,window=0)
-        
-        ct_list = []
-        for structNum in range(rna_obj.GetStructureNumber()):
-
-            length = rna_obj.GetSequenceLength()
-            free_energy = rna_obj.GetFreeEnergy(structNum+1) # 1 vs 0 indexing
-
-            # Write the header line of the 'ct file'
-            header = f'{length} dG = {free_energy} {structNum+1}'
-            ct_list.append(header)
-
-            # Loop through bases
-            for base in range(rna_obj.GetSequenceLength()):
-                base_num = base + 1
-                base_type = rna_obj.GetNucleotide(base_num)
-                base_back = base_num - 1
-                if base_num == rna_obj.GetSequenceLength()+1:
-                    base_forward = 0
-                else:
-                    base_forward = base_num + 1
-                base_pair = rna_obj.GetPair(base_num,structurenumber=structNum+1)
-                
-                #Write the line of the 'ct file'
-                line = f'{base_num} {base_type} {base_back} {base_forward} {base_pair} {base_num}'
-                ct_list.append(line)
-        
-        sen = sensor.Sensor(ct_list, leadingRecDat, laggingRecDat, self.bindingState, self.name, baseSeq)
+        # Create an RNSAstructure object 
+        RNA_obj = structure.RNAfolder(seq)
+        sen_in = seq.lower(), RNA_obj.structure_dict
+        sen = sensor.Sensor(sen_in, leadingRecDat, laggingRecDat, self.bindingState, self.name, baseSeq)
 
         return sen
 
