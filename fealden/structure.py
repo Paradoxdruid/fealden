@@ -57,25 +57,23 @@ class RNAfolder:
             comp = [[self.RNAobj.GetNucleotideXCoordinate(i),
                      self.RNAobj.GetNucleotideYCoordinate(i)] for i in range(1, len(self.RNAobj) + 1)]
             return comp
-    # def make_ct_list(self):
-    #     header = f'{len(self)} dG = '
 
     def dist_from_index(self, index1: int, index2: int, structure_num=1) -> float:       # INDEX STARTS @ 1
         """
-    Returns the distance between two nucleotides, index1 and index2, where index2 > index1
-    and the index values of draw_list start at 1 not 0 (i.e. base pair 12 corresponds to index 12
+        Returns the distance between two nucleotides, index1 and index2, where index2 > index1
+        and the index values of draw_list start at 1 not 0 (i.e. base pair 12 corresponds to index 12
 
 
-    PARAMETERS:
-        draw_list --> a list of nucleotide coordinates [x, y] returned from find_coordinates for a given
-                        structure where each [x, y] pair corresponds to a base pair of the structure
+        PARAMETERS:
+            draw_list --> a list of nucleotide coordinates [x, y] returned from find_coordinates for a given
+                            structure where each [x, y] pair corresponds to a base pair of the structure
 
-        index1 --> the nucleotide index of the first base pair used for the distance calculation
-                    (index starts at 1)
-        index2 --> the nucleotide index of the second base pair used for the distance calculation
-                    (index starts at 1).
+            index1 --> the nucleotide index of the first base pair used for the distance calculation
+                        (index starts at 1)
+            index2 --> the nucleotide index of the second base pair used for the distance calculation
+                        (index starts at 1).
 
-    """
+        """
         points = self.point_list[structure_num-1][index1-1] + self.point_list[structure_num-1][index2-1]
         return RNAfolder.dist(*points)
 
@@ -88,8 +86,9 @@ class RNAfolder:
         for i, a_dict in enumerate(tag_list):
             for [o, p] in prod:
                 tags_for_structure.append((o, p, self.dist_from_index(o, p, i+1)))
-            ''' sort list of tuples (bp1, bp2, magnitude) based off largest magnitude and set highest 
-                as the dictionary value for tag_list with the structure number as the key '''
+            
+            # sort list of tuples (bp1, bp2, magnitude) based off largest magnitude and set highest 
+            # as the dictionary value for tag_list with the structure number as the key
             a_dict[f'{i+1}'] = sorted(tags_for_structure, reverse=True, key=lambda points: points[2])[0]
 
         return tag_list
@@ -112,14 +111,3 @@ class RNAfolder:
 
     def __repr__(self):
         return f'RNAfolder instance\n sequence input: {self.seq}\n number of structures: {self.number_folds}'
-
-
-# seq_seq = 'aatattacacttaattagacgcctaattaaagataatcta'
-# seq_seq2 = 'taggaactcgaattaattagctcctaattaaagagttctct'
-# a = RNAfolder(f'{seq_seq2}')
-# print(f'a list of coordinates for each structure: {a.point_list}')
-# print(f'the distance between bp 1 and bp 39 is: {a.dist_from_index(1, 39)}')
-#
-# print(f'get the sequence length by calling len() on an instance of RNAfolder: {len(a)}')
-# print(f'structure dict: {a.structure_dict}')
-# print(f'the best tag locations are: {a.find_best_tag()}')

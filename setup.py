@@ -8,7 +8,7 @@ setup(
     packages=['fealden'],
     dependency_links=['https://rna.urmc.rochester.edu/RNAstructure.html'],
     version='0.1',
-    license='LGPL v3.0',
+    license='GPL v3.0',
     scripts=['bin/fealden'],
     include_package_data=True,
     package_data={'fealden': ['config.ini','../README.md']},
