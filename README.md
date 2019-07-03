@@ -26,11 +26,11 @@ To use **Fealden**:
 
 ----------------------
 
-### Authors
+### Contributors
 
 **Fealden** is developed as academic software by the **[Bonham Lab](http://www.bonhamlab.com)** and Dr. Andrew J. Bonham at the [Metropolitan State University of Denver](http://www.msudenver.edu).  It is licensed under the GPL v3.0.  
 
-Contributors include: Dr. Andrew J. Bonham (initial and ongoing development), Jody Stephens (early implementation), Becky Addison (early implementation), Aviva Bulow (code rewrite and development of current approach), and Austin Haider (further development).
+Contributors include: Dr. Andrew J. Bonham / [@Paradoxdruid]( https://github.com/Paradoxdruid ) (initial and ongoing development), Jody Stephens / [@23jodys]( https://github.com/23jodys ) (early implementation), Becky Addison (early implementation), Aviva Bulow / [@aviva-bulow]( https://github.com/aviva-bulow ) (code rewrite and development of current approach), and Austin Haider (further development).
 
 ---------------------
 
