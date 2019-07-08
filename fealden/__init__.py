@@ -1,3 +1,3 @@
-__all__ = ['fealden','fold','node','seed','sensor','structure']
+__all__ = ["fealden", "fold", "node", "seed", "sensor", "structure"]
 
 from fealden import *

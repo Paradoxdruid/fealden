@@ -14,58 +14,61 @@ import sys
 import shutil
 import tempfile
 
-BINDING_STATE = {'DS': 0, 'SS': 1}
+BINDING_STATE = {"DS": 0, "SS": 1}
 verbose = False
 
 # Set seed graph patterns from literature
 SEED_GRAPHS = {
-    0 : ['Seed Graph 1:',
-'2',
-'1 0 2',
-'2 1 3 3 5',
-'3 2 2',
-'5 2 0',
-'Seed Graph 2:',
-'2',
-'1 0 2',
-'2 1 3 3 0',
-'3 2 2',
-'Seed Graph 3:',
-'4',
-'1 0 2',
-'2 1 3 7 9',
-'3 2 4',
-'4 3 5 5 7',
-'5 4 4',
-'7 4 2',
-'9 2 0'
-],
-    1 : ['Seed Graph 1:',
-'5',
-'1 0 2',
-'2 1 3 3 5',
-'3 2 2',
-'5 2 0',
-'Seed Graph 2:',
-'7',
-'2 1 3 11 0',
-'3 2 4',
-'4 3 5 5 7',
-'5 4 4',
-'7 4 6',
-'6 7 9 9 11',
-'9 6 6',
-'11 6 2',
-'Seed Graph 3:',
-'3',
-'1 0 2',
-'2 1 3 3 0',
-'3 2 2']
+    0: [
+        "Seed Graph 1:",
+        "2",
+        "1 0 2",
+        "2 1 3 3 5",
+        "3 2 2",
+        "5 2 0",
+        "Seed Graph 2:",
+        "2",
+        "1 0 2",
+        "2 1 3 3 0",
+        "3 2 2",
+        "Seed Graph 3:",
+        "4",
+        "1 0 2",
+        "2 1 3 7 9",
+        "3 2 4",
+        "4 3 5 5 7",
+        "5 4 4",
+        "7 4 2",
+        "9 2 0",
+    ],
+    1: [
+        "Seed Graph 1:",
+        "5",
+        "1 0 2",
+        "2 1 3 3 5",
+        "3 2 2",
+        "5 2 0",
+        "Seed Graph 2:",
+        "7",
+        "2 1 3 11 0",
+        "3 2 4",
+        "4 3 5 5 7",
+        "5 4 4",
+        "7 4 6",
+        "6 7 9 9 11",
+        "9 6 6",
+        "11 6 2",
+        "Seed Graph 3:",
+        "3",
+        "1 0 2",
+        "2 1 3 3 0",
+        "3 2 2",
+    ],
 }
 
 
 def __main__():
-    '''
+    """
     __main__() begins the program, parses, and validates the command line arguments.
     The program is run by typing "python ./fealden.py STRING INT' where:
         STRING is a string, in quotes, which consists of A, T, C, G, a, c, t, or g
@@ -77,18 +80,22 @@ def __main__():
         None
     Returns:
         Nothing
-    '''
+    """
     parser = argparse.ArgumentParser()
-    parser.add_argument("recSeq", type=str,
-                        help="The sequenced recognized by your target \
+    parser.add_argument(
+        "recSeq",
+        type=str,
+        help="The sequenced recognized by your target \
                         represented as a string comprised of the letters 'a', 'A', 't', \
-                        'T', 'c', 'C', 'g', and 'G'.")
+                        'T', 'c', 'C', 'g', and 'G'.",
+    )
     parser.add_argument(
         "bindingState",
         type=int,
         help="The state of the sequence when bound to the target.\
                         \n This is 0 if your target binds to a double stranded sequence\
-                        and 1 if it binds to a single stranded sequence.")
+                        and 1 if it binds to a single stranded sequence.",
+    )
     parser.add_argument(
         "-ms",
         "-max_size",
@@ -96,7 +103,8 @@ def __main__():
         help="The maximum number of bases allowed in your sensor.\
                         This number must be greater than 20 and should probobly be less \
                         than 50.",
-        default=50)
+        default=50,
+    )
     parser.add_argument(
         "-sps",
         "-sens_per_seed",
@@ -105,30 +113,36 @@ def __main__():
                         structure. \n This number should be increased if you\
                         are not getting enough results. (Start by increasing it to 2000, \
                         and increase from there if you are still unsatisfied.)",
-        default=500)
+        default=500,
+    )
     parser.add_argument(
         "-i",
         "--interactive",
-        action='store_true',
-        help="Interactive Mode, no file output")
+        action="store_true",
+        help="Interactive Mode, no file output",
+    )
     parser.add_argument(
         "-out",
         "-output_file",
         type=str,
         help="The output file to store results.\n Results are written in CSV format.",
-        default=f'{time.strftime("%Y%m%d-%H%M%S")}-results.csv')
+        default=f'{time.strftime("%Y%m%d-%H%M%S")}-results.csv',
+    )
     parser.add_argument(
         "-v",
         "-verbose",
-        action='store_true',
-        help="Output information when each thread starts and completes operation.")
+        action="store_true",
+        help="Output information when each thread starts and completes operation.",
+    )
     # TODO: Binding affinity tuning
     # TODO: Anticipated target concentration tuning
 
     args = parser.parse_args()
-    invalidChars = re.compile('[^atgc]', re.IGNORECASE)
+    invalidChars = re.compile("[^atgc]", re.IGNORECASE)
     if invalidChars.search(args.recSeq):
-        print("Invalid recognition sequence.\nYou must enter a sequence consisisting only of a,c,t,g,A,C,T,G.")
+        print(
+            "Invalid recognition sequence.\nYou must enter a sequence consisisting only of a,c,t,g,A,C,T,G."
+        )
         exit(0)
     if args.bindingState != 0 and args.bindingState != 1:
         print("Invalid binding state. Argument must be 0 or 1. See -h for help.")
@@ -144,12 +158,12 @@ def __main__():
         args.ms,
         args.sps,
         args.interactive,
-        args.out)
-
+        args.out,
+    )
 
 
 def generate_sensor(seed, recSeq, numPossSen, core):
-    '''
+    """
     generate_sensor() generates a number of possible sensors and it returns the a list
     of valid sensors.
 
@@ -161,7 +175,7 @@ def generate_sensor(seed, recSeq, numPossSen, core):
 
     Retuns:
         sensors     <-- list of objecfs of the class 'Sensor'
-    '''
+    """
     global verbose
     if verbose:
         print("Starting: %s, core %d" % (seed.name, core))
@@ -188,14 +202,14 @@ def generate_sensor(seed, recSeq, numPossSen, core):
     return sensors
 
 
-'''***************************************************************************************
-Generating a Fealden object automatically runs all non-interactive parts of the program.
-***************************************************************************************'''
+# ***************************************************************************************
+# Generating a Fealden object automatically runs all non-interactive parts of the program.
+# ***************************************************************************************
 
 
 class Fealden:
 
-    '''
+    """
         __init__() the constructor for Fealden objects. The time it takes to run the
         program is printed to the standard out.
         To run this method sequentially, uncomment the 8th line in the method body.
@@ -213,16 +227,17 @@ class Fealden:
             outputfile     <-- a string, filename to store results in.
         Returns:
             an object of the class Fealden
-    '''
+    """
 
     def __init__(
-            self,
-            recSeq,
-            bindingState,
-            maxSensorSize,
-            minSensPerSeed,
-            interactive,
-            outputfile):
+        self,
+        recSeq,
+        bindingState,
+        maxSensorSize,
+        minSensPerSeed,
+        interactive,
+        outputfile,
+    ):
         self.recSeq = recSeq
         self.bindingState = bindingState
         self.maxSensorSize = maxSensorSize
@@ -252,12 +267,14 @@ class Fealden:
         i = 0
         while i < numProcess:
             i += 1
-            tasks.extend([(s, self.recSeq, seedSensPerProcess, i, )
-                          for s in seeds])
+            tasks.extend([(s, self.recSeq, seedSensPerProcess, i) for s in seeds])
 
         for t in tasks:
-            pool.apply_async(generate_sensor, t, callback=lambda result: sensors.update(
-                [(r.seq, r) for r in result]))
+            pool.apply_async(
+                generate_sensor,
+                t,
+                callback=lambda result: sensors.update([(r.seq, r) for r in result]),
+            )
         pool.close()
         pool.join()
 
@@ -265,15 +282,15 @@ class Fealden:
 
         if not interactive:
             try:
-                f = open(self.outputfile, 'w')
+                f = open(self.outputfile, "w")
             except IOError:
                 print("Unable to open " + self.outputfile)
                 self.outputfile = "recent-results.csv"
-                f = open(self.outputfile, 'w')
+                f = open(self.outputfile, "w")
 
-            f.write(sensor.Sensor.csv_header() + '\n')
+            f.write(sensor.Sensor.csv_header() + "\n")
             for sen in s:
-                f.write(str(sen) + '\n')
+                f.write(str(sen) + "\n")
             f.close()
 
             print("Stored " + str(len(s)) + " result(s) in " + self.outputfile)
@@ -286,7 +303,7 @@ class Fealden:
             self.output = output_list
 
     def parse_seed_file(self, lines):
-        '''
+        """
         parse_seed_file() is a simple method for parsing the seedGraph file.
         A seed graph file looks like this:
             Seed Graph 1:   <- The following information is for the first seed graph
@@ -320,8 +337,8 @@ class Fealden:
 
         Reutrns:
             seeds <-- a list of objects of the class "Seed"
-        '''
-        
+        """
+
         seeds = []
         i = 0
         li = lines[i]
@@ -330,7 +347,7 @@ class Fealden:
             i += 1
             li = lines[i]
             graphData = []
-            recNodeName = '-1'
+            recNodeName = "-1"
             seedNum += 1
             while i < (len(lines)) and lines[i].split()[0] != "Seed":
                 li = lines[i].strip()
@@ -342,8 +359,14 @@ class Fealden:
                 i += 1
             seeds.append(
                 seed.Seed(
-                    graphData, recNodeName, self.recSeq, self.bindingState, str(
-                        "Graph " + str(seedNum)), self.maxSensorSize))
+                    graphData,
+                    recNodeName,
+                    self.recSeq,
+                    self.bindingState,
+                    str("Graph " + str(seedNum)),
+                    self.maxSensorSize,
+                )
+            )
         return seeds
 
 

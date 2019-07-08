@@ -6,8 +6,9 @@ import subprocess
 import sys
 import configparser
 
+
 class Seed:
-    '''
+    """
     __init__() is the constructor for the class seed.
 
     Parameters:
@@ -26,9 +27,11 @@ class Seed:
     Returns:
         A Seed object
 
-    '''
+    """
 
-    def __init__(self, initData, recNodeName, recSeq, bindingState, seedName, maxSensorSize):
+    def __init__(
+        self, initData, recNodeName, recSeq, bindingState, seedName, maxSensorSize
+    ):
         self.name = seedName
         self.head = node.SSNode(None)
         self.nodes = {}
@@ -39,7 +42,7 @@ class Seed:
         self.make_graph(initData, self.head, self.nodes, recNodeName, recSeq)
 
     def make_graph(self, data, current, nodes, recNodeName, recSeq):
-        '''
+        """
         make_graph() uses the seed graph data to construct the graph. The data looks like
         this:
             [2 1 3 3 5,     <- This line represents the data for one node
@@ -106,7 +109,7 @@ class Seed:
 
         Returns:
             Nothing
-        '''
+        """
 
         firstNodeData = data[0].split()
         if int(firstNodeData[0]) % 2 == 0:
@@ -124,35 +127,36 @@ class Seed:
             self.build_the_rest(data[1:], nodes)
 
     def build_the_rest(self, data, nodes):
-        '''
+        """
         build_the_rest() is an auxiliary function of make_graph.
-        '''
+        """
         if not data:
-            #The list "data" is empty, we are out of data
+            # The list "data" is empty, we are out of data
             return
-        #"data" has at least one element
+        # "data" has at least one element
         currentLine = data[0].split()
         current = nodes[currentLine[0]]
         links = []
         for i, v in enumerate(currentLine[2:]):
             if v in nodes:
                 links.append(nodes[v])
-                if i == 2: #have to set prog. the prog this node was made with is actually a child
+                if i == 2:
+                    # have to set prog. the prog this node was made with is actually a child
                     nodes[v].set_progenitor(current)
-            elif v == '0':
+            elif v == "0":
                 links.append(None)
                 nodes[v] = None
-            elif int(v) % 2 == 0: #New DSNode
+            elif int(v) % 2 == 0:  # New DSNode
                 nodes[v] = node.DSNode(current)
                 links.append(nodes[v])
-            else:#new SSNode 
+            else:  # new SSNode
                 nodes[v] = node.SSNode(current)
                 links.append(nodes[v])
         current.set_links(links)
         self.build_the_rest(data[1:], nodes)
 
     def build_sensor(self, core, version, baseSeq):
-        '''
+        """
         build_sensor() first builds a 'Sensor' sequence using the 'Seed' of 'self'
         and an object of the 'random.Random' class. The sensor sequence is
         constructed. In some cases the seed graph may require the use of more bases
@@ -168,27 +172,29 @@ class Seed:
 
         Returns:
             a Sensor object
-        '''
+        """
         rand = random.Random()
         self.generate_node_sizes(rand)
         self.populate_nodes(rand)
-        seq = ''.join(self.get_sequence())
+        seq = "".join(self.get_sequence())
         seq = seq.upper()
-        #some graphs may result in sequences of larger length than maxSensorSize set by user
+        # some graphs may result in sequences of larger length than maxSensorSize set by user
         if len(seq) > self.maxSensorSize:
             return None
-            
+
         (leadingRecDat, laggingRecDat) = self.nodes[self.recNodeName].get_rec_seq_data()
-        
-        # Create an RNSAstructure object 
+
+        # Create an RNSAstructure object
         RNA_obj = structure.RNAfolder(seq)
         sen_in = seq.lower(), RNA_obj.structure_dict
-        sen = sensor.Sensor(sen_in, leadingRecDat, laggingRecDat, self.bindingState, self.name, baseSeq)
+        sen = sensor.Sensor(
+            sen_in, leadingRecDat, laggingRecDat, self.bindingState, self.name, baseSeq
+        )
 
         return sen
 
     def generate_node_sizes(self, rand):
-        '''
+        """
         generate_node_sizes() semi-randomly determines the size of the sensor, based on
         this number, a size for each node which represets physical DNA is assigned. Each
         node is given a minimum length of three bases or three base-pairs, depending on
@@ -205,57 +211,61 @@ class Seed:
 
         Returns:
             Nothing
-        '''
-        self.nodes[self.recNodeName].set_length(len(self.recSeq)) #min len of node with recSeq
-        #print "rec seq node len is " + str(self.nodes[self.recNodeName].get_length())
+        """
+        self.nodes[self.recNodeName].set_length(
+            len(self.recSeq)
+        )  # min len of node with recSeq
+        # print "rec seq node len is " + str(self.nodes[self.recNodeName].get_length())
         MAX_SIZE = self.maxSensorSize
         MIN_SIZE = 20
         size = rand.randint(MIN_SIZE, MAX_SIZE)
 
-        MIN_NODE_SIZE = 3 #to allow for loop SSNodes? 
+        MIN_NODE_SIZE = 3  # to allow for loop SSNodes?
 
         realNodes = {}
-        for n in self.nodes: #initializing "real" (ie rep. physical DNA) nodes to min size
+        for n in self.nodes:
+            # initializing "real" (ie rep. physical DNA) nodes to min size
             current = self.nodes[n]
-            if current == None: #this is not a 'real' node
+            if current == None:  # this is not a 'real' node
                 continue
             length = current.get_length()
-            
-            if length == 0:# this is not a 'real' node
+
+            if length == 0:  # this is not a 'real' node
                 continue
-            
-            if length == -1: #is empty
-                if current.get_state() == fold.Fold.SEQ_STATE["DS"]: #is DS
+
+            if length == -1:  # is empty
+                if current.get_state() == fold.Fold.SEQ_STATE["DS"]:  # is DS
                     realNodes[n] = (current, MIN_NODE_SIZE)
-                    size -= MIN_NODE_SIZE*2 #DS node uses 2X the number of bps
-                else: #is SS
+                    size -= MIN_NODE_SIZE * 2  # DS node uses 2X the number of bps
+                else:  # is SS
                     realNodes[n] = (current, MIN_NODE_SIZE)
                     size -= MIN_NODE_SIZE
-            else: #is not empty (ie. has recognition seq.)
-                if current.get_state() == fold.Fold.SEQ_STATE["DS"]: #is DS
+            else:  # is not empty (ie. has recognition seq.)
+                if current.get_state() == fold.Fold.SEQ_STATE["DS"]:  # is DS
                     realNodes[n] = (current, length)
-                    size -= 2*length #DS node uses 2X the number of bps
-                else: # is SS
+                    size -= 2 * length  # DS node uses 2X the number of bps
+                else:  # is SS
                     realNodes[n] = (current, length)
                     size -= length
-                    
-        keys = [n for n in realNodes] # a list of the 'key' names in the realNodes dict
-        while size > 0: #increasing the size of random nodes until size limit is reached
+
+        keys = [n for n in realNodes]  # a list of the 'key' names in the realNodes dict
+        while size > 0:
+            # increasing the size of random nodes until size limit is reached
             key = random.choice(keys)
             (current, length) = realNodes[key]
-            if current.get_state() == fold.Fold.SEQ_STATE["DS"]: #is DS
-                realNodes[key] = (current, length+1)
-                size -=2 #DS node uses 2X the number of bps
-            else: #is SS
-                realNodes[key] = (current, length+1)
-                size -=1
+            if current.get_state() == fold.Fold.SEQ_STATE["DS"]:  # is DS
+                realNodes[key] = (current, length + 1)
+                size -= 2  # DS node uses 2X the number of bps
+            else:  # is SS
+                realNodes[key] = (current, length + 1)
+                size -= 1
 
-        for r in realNodes: #assigning the new sizes to the respective nodes
+        for r in realNodes:  # assigning the new sizes to the respective nodes
             (n, s) = realNodes[r]
             n.set_length(s)
-            
+
     def populate_nodes(self, rand):
-        '''
+        """
         populate_nodes() populates the empty nodes with DNA bases (ie. A, C, T, or G)
         this method requires that all nodes, which are not None, have a length.
 
@@ -263,39 +273,44 @@ class Seed:
             rand    <-- a pointer to an object of a class from the module 'random'
         Returns:
             Nothing
-        '''
+        """
         for n in self.nodes.values():
             if n == None:
                 continue
             length = n.get_length()
             seq = []
-            #if this is the node with the recognition sequence we treat it differently
-            if n == self.nodes[self.recNodeName]: #is node with recognition sequence
-                extra = n.get_length() - len(self.recSeq) #the length not required for the recSeq
+            # if this is the node with the recognition sequence we treat it differently
+            if n == self.nodes[self.recNodeName]:  # is node with recognition sequence
+                extra = n.get_length() - len(self.recSeq)
+                # the length not required for the recSeq
                 if extra != 0:
-                    relLocRecSeq = rand.randint(1, extra) #the position of the recSeq in the node
+                    relLocRecSeq = rand.randint(
+                        1, extra
+                    )  # the position of the recSeq in the node
                     n.set_relLocRecStart(relLocRecSeq)
-                    #print "TADA: rel loc of rec seq is " + str(relLocRecSeq)
-                    n.set_relLocRecEnd(extra - (relLocRecSeq-1)+1)
-                    #print 'there are ' + str(extra - (relLocRecSeq -1)) + ' spots left.'
-                    #print 'rec seq size is ' + str(len(self.recSeq))
-                    #print 'node size is ' + str(n.get_length())
-                    #print 'node is ' + str(n)
-                    seq = self.generate_rand_DNA_string(relLocRecSeq-1, rand)
-                    end = self.generate_rand_DNA_string(extra - (relLocRecSeq-1), rand)
+                    # print "TADA: rel loc of rec seq is " + str(relLocRecSeq)
+                    n.set_relLocRecEnd(extra - (relLocRecSeq - 1) + 1)
+                    # print 'there are ' + str(extra - (relLocRecSeq -1)) + ' spots left.'
+                    # print 'rec seq size is ' + str(len(self.recSeq))
+                    # print 'node size is ' + str(n.get_length())
+                    # print 'node is ' + str(n)
+                    seq = self.generate_rand_DNA_string(relLocRecSeq - 1, rand)
+                    end = self.generate_rand_DNA_string(
+                        extra - (relLocRecSeq - 1), rand
+                    )
                     seq.extend(self.recSeq)
                     seq.extend(end)
                 else:
-                    #print "TADA: relitive loc of rec seq is 1."
+                    # print "TADA: relitive loc of rec seq is 1."
                     n.set_relLocRecStart(1)
                     n.set_relLocRecEnd(1)
                     seq = list(self.recSeq)
-            else: #this node does not contain the recognition sequence
+            else:  # this node does not contain the recognition sequence
                 seq = self.generate_rand_DNA_string(length, rand)
             n.set_seq(seq)
-     
+
     def generate_rand_DNA_string(self, size, rand):
-        '''
+        """
         generate_rand_DNA_string() generates a list of pseudo-randomly selected
         DNA bases (ie. A, C, T, or G) of a specified size.
 
@@ -305,13 +320,13 @@ class Seed:
 
         Returns:
             a list of random DNA letters
-        '''   
-        if size ==0:
+        """
+        if size == 0:
             return []
-        return [ rand.choice(['A', 'T', 'C', 'G']) for i in range(0, size) ]
+        return [rand.choice(["A", "T", "C", "G"]) for i in range(0, size)]
 
     def get_sequence(self):
-        '''
+        """
         get_sequence() returns the sequence represented by the populated nodes of
         the seed graph up to a given node. If the nodes are not populated, the function
         will return an empty sequence.
@@ -321,15 +336,15 @@ class Seed:
         Returns:
             A string. The sequence that was constructed using this seed graph. 
 
-        '''
+        """
         prev = self.head
         (sequence, current) = prev.get_seq_and_next_node(None, 0)
 
         while current != None:
             (seq, nxt) = current.get_seq_and_next_node(prev, len(sequence))
             sequence.extend(seq)
-            prev       = current
-            current    = nxt
+            prev = current
+            current = nxt
 
         return sequence
-        
+

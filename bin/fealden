@@ -6,6 +6,7 @@ import tempfile
 import os
 import time
 import re
+
 dir_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(dir_path)
 import fealden
@@ -13,16 +14,20 @@ import fealden
 
 def __main__():
     parser = argparse.ArgumentParser()
-    parser.add_argument("recSeq", type=str,
-                        help="The sequenced recognized by your target \
+    parser.add_argument(
+        "recSeq",
+        type=str,
+        help="The sequenced recognized by your target \
                         represented as a string comprised of the letters 'a', 'A', 't', \
-                        'T', 'c', 'C', 'g', and 'G'.")
+                        'T', 'c', 'C', 'g', and 'G'.",
+    )
     parser.add_argument(
         "bindingState",
         type=int,
         help="The state of the sequence when bound to the target.\
                         \n This is 0 if your target binds to a double stranded sequence\
-                        and 1 if it binds to a single stranded sequence.")
+                        and 1 if it binds to a single stranded sequence.",
+    )
     parser.add_argument(
         "-ms",
         "-max_size",
@@ -30,7 +35,8 @@ def __main__():
         help="The maximum number of bases allowed in your sensor.\
                         This number must be greater than 20 and should probobly be less \
                         than 50.",
-        default=50)
+        default=50,
+    )
     parser.add_argument(
         "-sps",
         "-sens_per_seed",
@@ -39,30 +45,36 @@ def __main__():
                         structure. \n This number should be increased if you\
                         are not getting enough results. (Start by increasing it to 2000, \
                         and increase from there if you are still unsatisfied.)",
-        default=500)
+        default=500,
+    )
     parser.add_argument(
         "-out",
         "-output_file",
         type=str,
         help="The output file to store results.\n Results are written in CSV format.",
-        default=f'{time.strftime("%Y%m%d-%H%M%S")}-results.csv')
+        default=f'{time.strftime("%Y%m%d-%H%M%S")}-results.csv',
+    )
     parser.add_argument(
         "-i",
         "--interactive",
-        action='store_true',
-        help="Interactive Mode, no file output.  Limited use on command line.")
+        action="store_true",
+        help="Interactive Mode, no file output.  Limited use on command line.",
+    )
     parser.add_argument(
         "-v",
         "-verbose",
-        action='store_true',
-        help="Output information when each thread starts and completes operation.")
+        action="store_true",
+        help="Output information when each thread starts and completes operation.",
+    )
     # TODO: Binding affinity tuning
     # TODO: Anticipated target concentration tuning
 
     args = parser.parse_args()
-    invalidChars = re.compile('[^atgc]', re.IGNORECASE)
+    invalidChars = re.compile("[^atgc]", re.IGNORECASE)
     if invalidChars.search(args.recSeq):
-        print("Invalid recognition sequence.\nYou must enter a sequence consisisting only of a,c,t,g,A,C,T,G.")
+        print(
+            "Invalid recognition sequence.\nYou must enter a sequence consisisting only of a,c,t,g,A,C,T,G."
+        )
         exit(0)
     if args.bindingState != 0 and args.bindingState != 1:
         print("Invalid binding state. Argument must be 0 or 1. See -h for help.")
@@ -78,7 +90,9 @@ def __main__():
         args.ms,
         args.sps,
         args.interactive,
-        args.out)
+        args.out,
+    )
+
 
 # run the program from the command line
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # fealden
 
-![gpl3.0](https://img.shields.io/github/license/Paradoxdruid/academia-admin-automation.svg "Licensed under GPL 3.0")
+![gpl3.0](https://img.shields.io/github/license/Paradoxdruid/academia-admin-automation.svg "Licensed under GPL 3.0")  [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 ### Introduction 
 **Fealden** is a command line tool to generate optimized structure switching DNA biosensors for fluorescent or electrochemical detection of trace amounts of a large number of biomolecule targets.  An abbreviated [bibliography](#bibliography) of works utilizing such nucleic acid-based biosensors is available below.
