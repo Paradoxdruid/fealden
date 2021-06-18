@@ -1,10 +1,5 @@
 from . import sensor, node, fold, structure
 import random
-import time
-import os
-import subprocess
-import sys
-import configparser
 
 
 class Seed:
@@ -43,10 +38,10 @@ class Seed:
 
     def make_graph(self, data, current, nodes, recNodeName, recSeq):
         """
-        make_graph() uses the seed graph data to construct the graph. The data looks like
+        make_graph() uses the seed graph data to construct the graph. Data example:
         this:
             [2 1 3 3 5,     <- This line represents the data for one node
-            3 2 2,          
+            3 2 2,
             5 2 4,
             4 5 7 7 0,
             7 4 4]
@@ -62,7 +57,7 @@ class Seed:
         numbers are the other nodes which can be linked through this one. If the current
         node is an SSNode, there will only be one other number, the downstream DSNode
         of this SSNode. If the current node is a DSNode, then there will be three more
-        numbers. The first is the link to the MidSSNode1, the next to MidSSNode2, the last
+        numbers. The 1st is the link to the MidSSNode1, the next to MidSSNode2, the last
         is to the downstreamSSnode. (In all cases, the links are listed in the order in
         which they would be encountered if the DNA strand were traced in the 5' to 3'
         direction.) Examples are given below.
@@ -70,12 +65,12 @@ class Seed:
         2 1 3 3 5
 
         The first number is a 2, so this is a DSNode, we're calling it '2'.
-        '2' has a progenitor (also called the upstream SSNode, attatched to the 5' end of
+        '2' has a progenitor (also called the upstream SSNode, attached to the 5' end of
         the "leading segment"). We're calling it '1'.
         '2' has a midSSNode1 (the SSNode that will be attatched to the 3' end of the
         "leading segment"). We're calling this SSNode, '3'.
         '2' also has a midSSNode2 (the SSNode that will be attached to 5' end of the
-        "lagging segment"). This SSNode is also called '3', so it's the same as midSSNode1.
+        "lagging segment"). This SSNode is also called '3', so same as midSSNode1.
         '2' has a downstream SSNode (attatched to the 5' end of the "lagging segment"),
         we're calling this SSNode '5'.
 
@@ -84,13 +79,13 @@ class Seed:
 
         The first number is a 3, which is odd, so this is a SSNode, and we're calling it
         '3.'
-        '3' has progenitor '2', so '3' is attached at it's 5' end to the DSNode called '2.'
+        '3' has progenitor '2', so '3' is attchd at it's 5' end to DSNode called '2.'
         '3' has downstream DSNode '2', so '3' is attatched at it's 3' end to the DSNode
         called '2.' (We can see that '3' must be a loop.)
 
         There are a few more rules for the seed graph data:
-            1) The first line of data must represent the first real node of the graph. (ie
-               it must be the node in which the first base pair from the 5' end will be.)
+            1) The 1st line of data must represent the first real node of the graph. (ie
+               it must be the node in which the 1st base pair from the 5' end will be.)
             2) If the graph starts with a DSNode, its progenitor must be lited as '1'.
             3) If the graph starts with an SSNode, the first node must be named '1', and
                its progenitor must be '0.'
@@ -100,7 +95,7 @@ class Seed:
             data         <-- A list. The data described above.
             current      <-- An object of the class Node. The node currently under
                              construction.
-            nodes        <-- A dictionary of Node objects. This dictionary will eventually
+            nodes        <-- A dictionary of Node objects. This dictionary will
                              contain all the nodes used in this seed graph.
             recNodeName  <-- A string. The name (which is also a key in the nodes
                              dictionary) of the node which will contain the recognition
@@ -141,7 +136,8 @@ class Seed:
             if v in nodes:
                 links.append(nodes[v])
                 if i == 2:
-                    # have to set prog. the prog this node was made with is actually a child
+                    # have to set prog.
+                    # the prog this node was made with is actually a child
                     nodes[v].set_progenitor(current)
             elif v == "0":
                 links.append(None)
@@ -161,13 +157,13 @@ class Seed:
         and an object of the 'random.Random' class. The sensor sequence is
         constructed. In some cases the seed graph may require the use of more bases
         than permitted by the user. In that case, this function returns None. Otherwise
-        the sensors sequence is fed to RNAstructure's FoldSingleStrand. A 'Sensor' object
+        the sensors sequence is fed to RNAstructure's FoldSingleStrand. A 'Sensor' obj
         is then constructed from the resulting data. This object is returned.
 
         Parameters:
             core     <-- An integer, the number of the processor using this function.
             version  <-- An integer, the number of the sensor being built on this seed.
-                         (ie. if this is the 1047th sensor built by processor 3 from seed
+                         (ie. if this is the 1047th sensor built by proc 3 from seed
                           graph number 4: core = 3 and version = 1047).
 
         Returns:
@@ -178,7 +174,8 @@ class Seed:
         self.populate_nodes(rand)
         seq = "".join(self.get_sequence())
         seq = seq.upper()
-        # some graphs may result in sequences of larger length than maxSensorSize set by user
+        # some graphs may result in sequences of larger length
+        # than maxSensorSize set by user
         if len(seq) > self.maxSensorSize:
             return None
 
@@ -200,7 +197,7 @@ class Seed:
         node is given a minimum length of three bases or three base-pairs, depending on
         node type. One of the nodes contains the recognition sequence, its minimum size
         is the length of that sequence. Based on these minimums and the sensor size, the
-        number of 'used bases' is calculated and subtracted from the sensor size. This new
+        number of 'used bases' is calced and subtracted from the sensor size. This new
         number is the number of bases left which are then assigned, randomly, to nodes.
         This method of determinig node size, while slightly complex, avoids many issues
         of other methods which comprimize the impartiality of random node size selection
@@ -226,7 +223,7 @@ class Seed:
         for n in self.nodes:
             # initializing "real" (ie rep. physical DNA) nodes to min size
             current = self.nodes[n]
-            if current == None:  # this is not a 'real' node
+            if current is None:  # this is not a 'real' node
                 continue
             length = current.get_length()
 
@@ -275,7 +272,7 @@ class Seed:
             Nothing
         """
         for n in self.nodes.values():
-            if n == None:
+            if n is None:
                 continue
             length = n.get_length()
             seq = []
@@ -290,7 +287,7 @@ class Seed:
                     n.set_relLocRecStart(relLocRecSeq)
                     # print "TADA: rel loc of rec seq is " + str(relLocRecSeq)
                     n.set_relLocRecEnd(extra - (relLocRecSeq - 1) + 1)
-                    # print 'there are ' + str(extra - (relLocRecSeq -1)) + ' spots left.'
+                    # print 'there are' + str(extra - (relLocRecSeq -1)) + 'spots left.'
                     # print 'rec seq size is ' + str(len(self.recSeq))
                     # print 'node size is ' + str(n.get_length())
                     # print 'node is ' + str(n)
@@ -334,17 +331,16 @@ class Seed:
         Parameters:
             None
         Returns:
-            A string. The sequence that was constructed using this seed graph. 
+            A string. The sequence that was constructed using this seed graph.
 
         """
         prev = self.head
         (sequence, current) = prev.get_seq_and_next_node(None, 0)
 
-        while current != None:
+        while current is not None:
             (seq, nxt) = current.get_seq_and_next_node(prev, len(sequence))
             sequence.extend(seq)
             prev = current
             current = nxt
 
         return sequence
-

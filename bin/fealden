@@ -1,8 +1,6 @@
 #!/usr/bin/env python3
 import sys
 import argparse
-import shutil
-import tempfile
 import os
 import time
 import re
@@ -18,23 +16,23 @@ def __main__():
         "recSeq",
         type=str,
         help="The sequenced recognized by your target \
-                        represented as a string comprised of the letters 'a', 'A', 't', \
-                        'T', 'c', 'C', 'g', and 'G'.",
+                represented as a string comprised of the letters 'a', 'A', 't', \
+                'T', 'c', 'C', 'g', and 'G'.",
     )
     parser.add_argument(
         "bindingState",
         type=int,
         help="The state of the sequence when bound to the target.\
-                        \n This is 0 if your target binds to a double stranded sequence\
-                        and 1 if it binds to a single stranded sequence.",
+                \n This is 0 if your target binds to a double stranded sequence\
+                and 1 if it binds to a single stranded sequence.",
     )
     parser.add_argument(
         "-ms",
         "-max_size",
         type=int,
         help="The maximum number of bases allowed in your sensor.\
-                        This number must be greater than 20 and should probobly be less \
-                        than 50.",
+                This number must be greater than 20 and should probobly be less \
+                than 50.",
         default=50,
     )
     parser.add_argument(
@@ -42,9 +40,9 @@ def __main__():
         "-sens_per_seed",
         type=int,
         help="The minimum number of potential sensors per seed graph \
-                        structure. \n This number should be increased if you\
-                        are not getting enough results. (Start by increasing it to 2000, \
-                        and increase from there if you are still unsatisfied.)",
+                structure. \n This number should be increased if you\
+                are not getting enough results. (Start by increasing it to 2000, \
+                and increase from there if you are still unsatisfied.)",
         default=500,
     )
     parser.add_argument(
@@ -73,7 +71,8 @@ def __main__():
     invalidChars = re.compile("[^atgc]", re.IGNORECASE)
     if invalidChars.search(args.recSeq):
         print(
-            "Invalid recognition sequence.\nYou must enter a sequence consisisting only of a,c,t,g,A,C,T,G."
+            "Invalid recognition sequence.\n \
+            You must enter a sequence consisisting only of a,c,t,g,A,C,T,G."
         )
         exit(0)
     if args.bindingState != 0 and args.bindingState != 1:

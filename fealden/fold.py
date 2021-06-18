@@ -116,7 +116,8 @@ class Fold:
         prevPair = self.foldData[currentIndex][1] + 1
         for i, v in enumerate(self.foldData[currentIndex::]):
             if (v[1] == prevPair - 1) and (v[1] != 0):
-                # self.ptrList[i+currentIndex] = currentNode #already set when building strand 1
+                # self.ptrList[i+currentIndex] = currentNode
+                # #already set when building strand 1
                 # self.ptrList[prevPair-2] = currentNode #already set when
                 # building strand 1
                 prevPair -= 1
@@ -130,7 +131,7 @@ class Fold:
 
     def get_distance(self, index1, index2):
         """
-        get_distance (is a proper distance metric which) captures the approximate spacial
+        get_distance (is a proper distance metric which) captures the approx. spacial
         distance between two base pairs
 
         Parameters:
@@ -152,10 +153,10 @@ class Fold:
             return node1.get_index_distance(index1, index2)
         dist = sys.maxsize
         links = node1.get_links()
-        for l in links:
-            distToIndex2 = self.get_dist_to_index(index2, [node1], node1, l)
+        for each in links:
+            distToIndex2 = self.get_dist_to_index(index2, [node1], node1, each)
 
-            tempDist = distToIndex2 + node1.get_index_to_link_dist(index1, l, 0)
+            tempDist = distToIndex2 + node1.get_index_to_link_dist(index1, each, 0)
             if tempDist < dist:
                 dist = tempDist
         return dist
@@ -180,11 +181,11 @@ class Fold:
         dist = sys.maxsize
         links = current.get_links()
         traversed.append(current)
-        for l in links:
-            if l in traversed:
+        for each in links:
+            if each in traversed:
                 continue
-            tempDist = current.get_distance(previous, l) + self.get_dist_to_index(
-                index, [j for j in traversed], current, l
+            tempDist = current.get_distance(previous, each) + self.get_dist_to_index(
+                index, [j for j in traversed], current, each
             )
             if tempDist < dist:
                 dist = tempDist
@@ -193,7 +194,7 @@ class Fold:
 
     def get_rec_seq_state(self):
         """
-        get_rec_seq_state() gets the state (ie DS, SS, or Mixed) into which the recognition
+        get_rec_seq_state() gets the state (ie DS, SS, or Mixed) into which the rec
         sequence has folded.
 
         Parameters:

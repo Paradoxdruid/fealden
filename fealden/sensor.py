@@ -18,22 +18,22 @@ class Sensor:
         """
         This is the constructor for Sensor.
         Paramaters:
-                    dataFile <- a File object (this should be the .ct
-                                               returned from a unafold query)
-                    recSeq   <- a dict of the form {'start': n, 'end': p}, where n,p are
-                                integers and represent, respectivly, the starting and
-                                ending locaiton of the recognition sequence within the
-                                overall sensor's sequence.
-                    respSeq <- a dict of the form {'start': n, 'end': p}, where n,p are
-                                integers and represent, respectivly, the starting and
-                                ending locaiton of the recognition response sequence
-                                within the overall sensor's sequence. n and p are both -1
-                                if the recognition sequence is single stranded.
-                    desRecSeqState <- An integer, either 0 or 1, representing the state in
-                                which the recognition sequence binds to the target.
-                                0 represents double stranded, 1 represents single stranded.
-                    seedName <- An integer, this is a simple tag to represent which
-                                graph gave rise to this sensor.
+                dataFile <- a File object (this should be the .ct
+                                            returned from a unafold query)
+                recSeq   <- a dict of the form {'start': n, 'end': p}, where n,p are
+                            integers and represent, respectivly, the starting and
+                            ending locaiton of the recognition sequence within the
+                            overall sensor's sequence.
+                respSeq <- a dict of the form {'start': n, 'end': p}, where n,p are
+                            integers and represent, respectivly, the starting and
+                            ending locaiton of the recognition response sequence
+                            within the overall sensor's sequence. n and p are both -1
+                            if the recognition sequence is single stranded.
+                desRecSeqState <- An integer, either 0 or 1, representing the state in
+                            which the recognition sequence binds to the target.
+                            0 represents double stranded, 1 represents single stranded.
+                seedName <- An integer, this is a simple tag to represent which
+                            graph gave rise to this sensor.
         """
         self.seedName = seedName
         self.recSeq = recSeq
@@ -212,29 +212,30 @@ class Sensor:
         get_tagging_information() finds the optimal tagging situation, and returns some
         information with which it is associated. The information returned is labeled in
         the "Returns:" section below and should be interperated as follows:
-            position               -- the location, expressed as an integer, of the base
-                                      to be tagged
-            onConc                 -- the (relative) concentration of sensor that's 'on.'
-            offConc                -- the (relative) concentration of sensor that's 'off.'
-            noiseConc              -- the (relative) concentration of sensors that are
-                                      'wrong' or 'fuzzy.'
-            concWrong              -- the relative concentration of sensor that is on/off
-                                      when it should be the opposite. (ie it's in the
-                                      wrong state.)
-            concFuzzy              -- the relative concentration of sensor in which the
-                                      tags are neither close enough to be 'on' nor far
-                                      enough away from the 'on' states to be truly 'off.'
-            weightedAvgOnToOffDist -- the average distance of the on states
-                                      less the average distance of the off states.
-                                      All averages are weighted based on the
-                                      concentrations of the various on and off states.
+        position               -- the location, expressed as an integer, of the base
+                                    to be tagged
+        onConc                 -- the (relative) concentration of sensor that's 'on.'
+        offConc                -- the (relative) concentration of sensor that's 'off.'
+        noiseConc              -- the (relative) concentration of sensors that are
+                                    'wrong' or 'fuzzy.'
+        concWrong              -- the relative concentration of sensor that is on/off
+                                    when it should be the opposite. (ie it's in the
+                                    wrong state.)
+        concFuzzy              -- the relative concentration of sensor in which the
+                                    tags are neither close enough to be 'on' nor far
+                                    enough away from the 'on' states to be truly 'off.'
+        weightedAvgOnToOffDist -- the average distance of the on states
+                                    less the average distance of the off states.
+                                    All averages are weighted based on the
+                                    concentrations of the various on and off states.
 
 
         Parameters:
             None
 
         Returns:
-            (position, onConc, offConc, noiseConc, concWrong, concFuzzy, weightedAvgOnToOffDist)
+            (position, onConc, offConc, noiseConc,
+            concWrong, concFuzzy, weightedAvgOnToOffDist)
         """
         # print  "In get_tagging_information()"
         MAX_ON_DIST = 12
@@ -312,7 +313,8 @@ class Sensor:
                         # this is only to speed it up when we don't want any
                         # noise
                         break
-                else:  # the tag distance is not close enough to be on nor far enough to be off
+                # the tag distance is not close enough nor far enough to be off
+                else:
                     concFuzzy += currFold.conc
                     # this is only to speed it up when we don't want any noise
                     break
@@ -418,7 +420,7 @@ class Sensor:
 
     def __repr__(self):
         """
-        __repr__() generates the string representation of a sensor. It is essentially all
+        __repr__() generates the string representation of a sensor. It is all
         the information one might want to know about a sensor.
 
 

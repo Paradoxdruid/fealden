@@ -4,15 +4,10 @@ from . import seed
 import multiprocessing
 import copy
 from . import sensor
-import os
 import timeit
 import time
 import argparse
 import re
-import random
-import sys
-import shutil
-import tempfile
 
 BINDING_STATE = {"DS": 0, "SS": 1}
 verbose = False
@@ -86,23 +81,23 @@ def __main__():
         "recSeq",
         type=str,
         help="The sequenced recognized by your target \
-                        represented as a string comprised of the letters 'a', 'A', 't', \
-                        'T', 'c', 'C', 'g', and 'G'.",
+                represented as a string comprised of the letters 'a', 'A', 't', \
+                'T', 'c', 'C', 'g', and 'G'.",
     )
     parser.add_argument(
         "bindingState",
         type=int,
         help="The state of the sequence when bound to the target.\
-                        \n This is 0 if your target binds to a double stranded sequence\
-                        and 1 if it binds to a single stranded sequence.",
+                \n This is 0 if your target binds to a double stranded sequence\
+                and 1 if it binds to a single stranded sequence.",
     )
     parser.add_argument(
         "-ms",
         "-max_size",
         type=int,
         help="The maximum number of bases allowed in your sensor.\
-                        This number must be greater than 20 and should probobly be less \
-                        than 50.",
+                This number must be greater than 20 and should probobly be less \
+                than 50.",
         default=50,
     )
     parser.add_argument(
@@ -110,9 +105,9 @@ def __main__():
         "-sens_per_seed",
         type=int,
         help="The minimum number of potential sensors per seed graph \
-                        structure. \n This number should be increased if you\
-                        are not getting enough results. (Start by increasing it to 2000, \
-                        and increase from there if you are still unsatisfied.)",
+                structure. \n This number should be increased if you\
+                are not getting enough results. (Start by increasing it to 2000, \
+                and increase from there if you are still unsatisfied.)",
         default=500,
     )
     parser.add_argument(
@@ -141,7 +136,8 @@ def __main__():
     invalidChars = re.compile("[^atgc]", re.IGNORECASE)
     if invalidChars.search(args.recSeq):
         print(
-            "Invalid recognition sequence.\nYou must enter a sequence consisisting only of a,c,t,g,A,C,T,G."
+            "Invalid recognition sequence.\n \
+                You must enter a sequence consisisting only of a,c,t,g,A,C,T,G."
         )
         exit(0)
     if args.bindingState != 0 and args.bindingState != 1:
@@ -202,9 +198,9 @@ def generate_sensor(seed, recSeq, numPossSen, core):
     return sensors
 
 
-# ***************************************************************************************
-# Generating a Fealden object automatically runs all non-interactive parts of the program.
-# ***************************************************************************************
+# *************************************************************************************
+# Generating a Fealden object auto-runs all non-interactive parts of the program.
+# *************************************************************************************
 
 
 class Fealden:
@@ -218,11 +214,11 @@ class Fealden:
             recSeq         <-- a string, the recognition sequence.
             bindingState   <-- an integer, 0 or 1, representing the binding state of the
                                recognition sequence.
-            maxSensorSize  <-- an integer, the maximum number of bases the user would like
+            maxSensorSize  <-- an integer, the max number of bases the user would like
                                in their sensor.
             minSensPerSeed <-- an integer, the minimum number of potential sensors to be
                                generated per seed graph.
-            interactive    <-- a bool, enable interactive mode to store results in output
+            interactive    <-- a bool for interactive mode to store results in output
                                attribute, rather than write to a csv file.
             outputfile     <-- a string, filename to store results in.
         Returns:
@@ -307,7 +303,7 @@ class Fealden:
         parse_seed_file() is a simple method for parsing the seedGraph file.
         A seed graph file looks like this:
             Seed Graph 1:   <- The following information is for the first seed graph
-            2               <- The name of the node which will contain the recognition seq
+            2               <- The name of the node which contains the recognition seq
             2 1 3 3 5
             3 2 2
             5 2 4
@@ -328,12 +324,12 @@ class Fealden:
         of how the data given corrilates to a graph.
 
         This method breaks the data into chunks, one per seed graph, where each chunk is
-        a list containing all the information about that particular graph. Then each list
-        is used to generate a new seed graph using the class Seed. A list of Seed objects
+        a list containing all the info about that particular graph. Then each list
+        is used to generate a new seed graph using the class Seed. A list of Seed objs
         is returned.
 
         Parameters:
-            lines <-- a list of strings, each string is a line in the seed graph data file
+            lines <-- a list of str, each str is a line in the seed graph data file
 
         Reutrns:
             seeds <-- a list of objects of the class "Seed"

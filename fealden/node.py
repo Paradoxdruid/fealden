@@ -4,7 +4,7 @@ from . import fold
 class Node:
     """
     Node is the class from which DSNode and SSNode inherit. It is a convenient place for
-    getters and setters that are identical in both classes. It also contains a list of empty
+    getters and setters that are identical in both. It also contains a list of empty
     methods that are implemented in both classes.
     """
 
@@ -184,7 +184,7 @@ class DSNode(Node):
         Returns:
             [l1, l2, l3, l4]    <-- a list of links. The first is the upstreamSSNode,
                                     then the downstream SSNode, then the first midstream
-                                    SSNode (which would physically connect to the upstream
+                                    SSNode (which would connect to the upstream
                                     SSNode if this DSNode were unzipped), and lastly the
                                     second midstream SSNode (which would connect to the
                                     downstream SSNode were this DSNode unzipped).
@@ -218,13 +218,13 @@ class DSNode(Node):
             # to account for the two base pairs that link up the two nodes
             return 2 * DSNode.DIST_MULTIPLIER
         else:
-            # links are on opposite sides of this node, so the distance between them is the
+            # links are on opp. sides of this node, so the distance between them is the
             # length of this node
             return self.length * DSNode.DIST_MULTIPLIER
 
     def get_index_distance(self, index1, index2):
         """
-        get_index_distance() gets the distance between the indices of two bps on this node.
+        get_index_distance() gets the dist between the indices of two bps on this node.
         Since this is a double stranded node, the index distance is index2-index1.
 
         Parameters:
@@ -280,21 +280,21 @@ class DSNode(Node):
     def get_index_to_link_dist(self, index, link, num):
         """
         get_index_to_link_dist() calculates the distance between an index in a node and
-        a link at an end of the node. This method is only used by the distance functions,
+        a link at an end of the node. This method is only used by the distance funcs,
         and it has a slightly odd feature: In order to calculate the distance between
-        index1 and index2, we must calculate the distances from index1 to a link that will
-        lead to index2, and from a link, ariving from index1, to index2. In the first case
+        index1 and index2, we must calc the distances from index1 to a link that will
+        lead to index2, and from a link, ariving from index1, to index2. In the 1st case
         we do not wish to count index1 as part of the distance. In the second case we do
-        count index2. The reason for this disparity can be seen if one tries to calculate
+        count index2. The reason for this disparity can be seen if one tries to calc
         the distance between 1 and 10 as follows:
             1-2-3-4-5-6-Link-7-8-9-10
-        We need to calculate on either side of the link seperatly. We can count 5 integers
+        We need to calculate on either side of the link seperatly. We can count 5 ints
         between 1 and the Link, and three between 10 and the link. This gives us a value
-        of 8. But the distance between 1 and 10 (ie. 10-1) is obviously 9. This disparity
+        of 8. But the dist between 1 and 10 (ie. 10-1) is obviously 9. This disparity
         is due to the fact that, in calcuating the euclidian distance between 1 and 10,
         the number 10 is included. For this reason, an extra parameter (num) has been
-        added to this function. Num should be 0 if the function is calculating a distance
-        between an index and a link (ie. between 1 and Link in our example), and it shoud
+        added to this function. Num should be 0 if the function is calculating a dist
+        between an idx and a link (ie. between 1 and Link in our example), and it should
         be 1 if calculating between a link and an index (between Link and 10 in our
         example). This is used to make the needed correction.
 
@@ -461,21 +461,21 @@ class SSNode(Node):
     def get_index_to_link_dist(self, index, link, num):
         """
         get_index_to_link_dist() calculates the distance between an index in a node and
-        a link at an end of the node. This method is only used by the distance functions,
+        a link at an end of the node. This method is only used by the dist functions,
         and it has a slightly odd feature: In order to calculate the distance between
-        index1 and index2, we must calculate the distances from index1 to a link that will
-        lead to index2, and from a link, ariving from index1, to index2. In the first case
+        index1 and index2, we must calculate the dists from index1 to a link that will
+        lead to index2, and from a link, ariving from index1, to index2. In the 1st case
         we do not wish to count index1 as part of the distance. In the second case we do
-        count index2. The reason for this disparity can be seen if one tries to calculate
+        count index2. The reason for this disparity can be seen if one tries to calc
         the distance between 1 and 10 as follows:
             1-2-3-4-5-6-Link-7-8-9-10
-        We need to calculate on either side of the link seperatly. We can count 5 integers
+        We need to calculate on either side of the link seperatly. We can count 5 ints
         between 1 and the Link, and three between 10 and the link. This gives us a value
-        of 8. But the distance between 1 and 10 (ie. 10-1) is obviously 9. This disparity
+        of 8. But the dist between 1 and 10 (ie. 10-1) is obviously 9. This disparity
         is due to the fact that, in calcuating the euclidian distance between 1 and 10,
         the number 10 is included. For this reason, an extra parameter (num) has been
-        added to this function. Num should be 0 if the function is calculating a distance
-        between an index and a link (ie. between 1 and Link in our example), and it shoud
+        added to this function. Num should be 0 if the function is calculating a dist
+        between an idx and a link (ie. between 1 and Link in our example), and it should
         be 1 if calculating between a link and an index (between Link and 10 in our
         example). This is used to make the needed correction.
 

@@ -20,14 +20,16 @@ except Exception as error:
 
 class RNAfolder:
     """
-    RNAfolder composes an instance of the RNA class in RNAstructure and generates useful attribute data
+    RNAfolder composes an instance of the RNA class in RNAstructure
+    and generates useful attribute data
     reflecting the secondary structure(s) of the input sequence.
 
     NOTE: currently hard coded to interpret input as DNA
 
     Parameters:
 
-                seq --> The sequence of nucleotides that you wish to be queried for structure prediction
+        seq --> The sequence of nucleotides that you wish to
+            be queried for structure prediction
 
     """
 
@@ -45,7 +47,8 @@ class RNAfolder:
 
     def make_fold_dict(self):
         """
-        make_fold_dict populates the list of dictionaries (self.structure_dict) defined in __init__
+        make_fold_dict populates the list of dictionaries
+        (self.structure_dict) defined in __init__
         """
         seq_len = len(self.RNAobj)
         for i, each_dict in enumerate(self.structure_dict):
@@ -73,18 +76,20 @@ class RNAfolder:
         self, index1: int, index2: int, structure_num=1
     ) -> float:  # INDEX STARTS @ 1
         """
-        Returns the distance between two nucleotides, index1 and index2, where index2 > index1
-        and the index values of draw_list start at 1 not 0 (i.e. base pair 12 corresponds to index 12
+        Returns the distance between two nucleotides, index1 and index2,
+        where index2 > index1 and the index values of draw_list start at 1 not 0
+        (i.e. base pair 12 corresponds to index 12
 
 
         PARAMETERS:
-            draw_list --> a list of nucleotide coordinates [x, y] returned from find_coordinates for a given
-                            structure where each [x, y] pair corresponds to a base pair of the structure
+            draw_list --> a list of nucleotide coordinates [x, y] returned from
+                find_coordinates for a given structure where each [x, y] pair
+                corresponds to a base pair of the structure
 
-            index1 --> the nucleotide index of the first base pair used for the distance calculation
-                        (index starts at 1)
-            index2 --> the nucleotide index of the second base pair used for the distance calculation
-                        (index starts at 1).
+            index1 --> the nucleotide index of the first base pair used for the
+                distance calculation (index starts at 1)
+            index2 --> the nucleotide index of the second base pair used for the
+                distance calculation (index starts at 1).
 
         """
         points = (
@@ -107,8 +112,9 @@ class RNAfolder:
             for [o, p] in prod:
                 tags_for_structure.append((o, p, self.dist_from_index(o, p, i + 1)))
 
-            # sort list of tuples (bp1, bp2, magnitude) based off largest magnitude and set highest
-            # as the dictionary value for tag_list with the structure number as the key
+            # sort list of tuples (bp1, bp2, magnitude) based off largest magnitude
+            # and set highest as the dictionary value for tag_list with the
+            # structure number as the key
             a_dict[f"{i+1}"] = sorted(
                 tags_for_structure, reverse=True, key=lambda points: points[2]
             )[0]
@@ -132,5 +138,5 @@ class RNAfolder:
         return self.seq
 
     def __repr__(self):
-        return f"RNAfolder instance\n sequence input: {self.seq}\n number of structures: {self.number_folds}"
-
+        return f"RNAfolder instance\n sequence input: {self.seq}\n \
+            number of structures: {self.number_folds}"
