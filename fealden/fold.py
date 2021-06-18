@@ -4,7 +4,6 @@ import math
 
 
 class Fold:
-
     """The constructor for Fold.
 
         Parameters:

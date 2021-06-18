@@ -65,7 +65,8 @@ SEED_GRAPHS = {
 
 
 def __main__():
-    """__main__() begins the program, parses, and validates the command line arguments.
+    """
+    __main__() begins the program, parses, and validates the command line arguments.
 
     The program is run by typing "python ./fealden.py STRING INT' where:
         STRING is a string, in quotes, which consists of A, T, C, G, a, c, t, or g
@@ -131,8 +132,8 @@ def __main__():
         action="store_true",
         help="Output information when each thread starts and completes operation.",
     )
-    # TODO: Binding affinity tuning
-    # TODO: Anticipated target concentration tuning
+    # Up next: Binding affinity tuning
+    # Up next: Anticipated target concentration tuning
 
     args = parser.parse_args()
     invalidChars = re.compile("[^atgc]", re.IGNORECASE)
@@ -162,8 +163,7 @@ def __main__():
 
 def generate_sensor(seed, recSeq, numPossSen, core):
     """
-    generate_sensor() generates a number of possible sensors and it returns the a list
-    of valid sensors.
+    generate_sensor() gens a # of possible sensors and returns a list of valid sensors.
 
     Parameters:
         seed        <-- an object of the 'Seed' class, the seed graph for the sensor

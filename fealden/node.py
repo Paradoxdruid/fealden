@@ -170,13 +170,13 @@ class DSNode(Node):
             if self.relLocRecStart != -1:  # this node contains the recognition sequence
                 self.recSeqStart = self.strand1Start + self.relLocRecStart - 1
             return (self.seq, self.midSSNode1)
-        elif prog == self.midSSNode2:
+        if prog == self.midSSNode2:
             self.strand2Start = prev_length + 1
             if self.relLocRecEnd != -1:  # this node contains the recognition sequence
                 self.recRespStart = self.strand2Start + self.relLocRecEnd
             return (self.get_response(self.seq), self.downstreamSSNode)
-        else:  # error, the only two upstream nodes are accounted for
-            print("Error in get_seq_and_next_node() of DSNode: False progenitor given.")
+        # error, the only two upstream nodes are accounted for
+        print("Error in get_seq_and_next_node() of DSNode: False progenitor given.")
 
     def get_links(self):
         """
@@ -220,10 +220,9 @@ class DSNode(Node):
             # both links are on the same side of current node, return distance as 2
             # to account for the two base pairs that link up the two nodes
             return 2 * DSNode.DIST_MULTIPLIER
-        else:
-            # links are on opp. sides of this node, so the distance between them is the
-            # length of this node
-            return self.length * DSNode.DIST_MULTIPLIER
+        # links are on opp. sides of this node, so the distance between them is the
+        # length of this node
+        return self.length * DSNode.DIST_MULTIPLIER
 
     def get_index_distance(self, index1, index2):
         """
@@ -258,8 +257,7 @@ class DSNode(Node):
         """
         if index > (self.strand1Start + self.length):
             return self.length - (index - self.strand2Start)
-        else:
-            return index - self.strand1Start + 1
+        return index - self.strand1Start + 1
 
     def contains(self, index):
         """
@@ -272,13 +270,10 @@ class DSNode(Node):
         Returns:
             a boolean
         """
-        if (
-            index < (self.strand1Start + self.length) and index >= self.strand1Start
-        ) or (index < (self.strand2Start + self.length) and index >= self.strand2Start):
 
-            return True
-        else:
-            return False
+        return (
+            index < (self.strand1Start + self.length) and index >= self.strand1Start
+        ) or (index < (self.strand2Start + self.length) and index >= self.strand2Start)
 
     def get_index_to_link_dist(self, index, link, num):
         """
@@ -316,11 +311,11 @@ class DSNode(Node):
         loc = self.get_location_of(index)
         if link is self.upstreamSSNode or link is self.downstreamSSNode:
             return (loc - 1 + num) * DSNode.DIST_MULTIPLIER
-        elif link is self.midSSNode1 or link is self.midSSNode2:
+        if link is self.midSSNode1 or link is self.midSSNode2:
             return (self.length - loc + num) * DSNode.DIST_MULTIPLIER
-        else:  # bad link
-            print("Bad Link: DSNode get_index_to_link_dist node.py")
-            return -2
+        # bad link
+        print("Bad Link: DSNode get_index_to_link_dist node.py")
+        return -2
 
 
 class SSNode(Node):
@@ -390,8 +385,8 @@ class SSNode(Node):
             if self.relLocRecStart != -1:  # this node contains the recognition sequence
                 self.recSeqStart = self.start + self.relLocRecStart - 1
             return (self.seq, self.downstreamDSNode)
-        else:  # error, the only upstream node is accounted for
-            print("Error in get_seq_and_next_node() of SSNode: False progenitor given.")
+        # error, the only upstream node is accounted for
+        print("Error in get_seq_and_next_node() of SSNode: False progenitor given.")
 
     def get_links(self):
         """
@@ -502,10 +497,10 @@ class SSNode(Node):
                 if distToUpstream < distToDownstream
                 else distToDownstream
             )
-        elif link is self.upstreamDSNode:
+        if link is self.upstreamDSNode:
             return distToUpstream
-        elif link is self.downstreamDSNode:
+        if link is self.downstreamDSNode:
             return distToDownstream
-        else:  # bad link
-            print("Bad Link: SSNode get_index_to_link_dist from node.py")
-            return -2
+        # bad link
+        print("Bad Link: SSNode get_index_to_link_dist from node.py")
+        return -2
