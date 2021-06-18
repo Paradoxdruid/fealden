@@ -19,6 +19,7 @@ except Exception as error:
 
 
 class RNAfolder:
+
     """
     RNAfolder composes an instance of the RNA class in RNAstructure
     and generates useful attribute data
@@ -34,6 +35,7 @@ class RNAfolder:
     """
 
     def __init__(self, seq):
+        """Initialize RNAfolder object."""
         self.seq = seq.upper()
         self.RNAobj = RNAstructure.RNA.fromString(f"{self.seq}", backbone="dna")
         self.RNAobj.FoldSingleStrand(percent=15, window=0)
@@ -132,11 +134,14 @@ class RNAfolder:
             return mag
 
     def __len__(self):
+        """Return sequence length."""
         return self.RNAobj.GetSequenceLength()
 
     def __str__(self):
+        """Return string representation."""
         return self.seq
 
     def __repr__(self):
+        """Return representation."""
         return f"RNAfolder instance\n sequence input: {self.seq}\n \
             number of structures: {self.number_folds}"

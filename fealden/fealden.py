@@ -9,6 +9,8 @@ import time
 import argparse
 import re
 
+# __all__ = ["Fealden", "Fold", "Node", "Seed", "Sensor", "Structure"]
+
 BINDING_STATE = {"DS": 0, "SS": 1}
 verbose = False
 
@@ -63,8 +65,8 @@ SEED_GRAPHS = {
 
 
 def __main__():
-    """
-    __main__() begins the program, parses, and validates the command line arguments.
+    """__main__() begins the program, parses, and validates the command line arguments.
+
     The program is run by typing "python ./fealden.py STRING INT' where:
         STRING is a string, in quotes, which consists of A, T, C, G, a, c, t, or g
         and which represents the recognition sequence
@@ -234,6 +236,7 @@ class Fealden:
         interactive,
         outputfile,
     ):
+        """Initialize new Fealden instance."""
         self.recSeq = recSeq
         self.bindingState = bindingState
         self.maxSensorSize = maxSensorSize

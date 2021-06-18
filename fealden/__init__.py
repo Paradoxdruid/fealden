@@ -1,3 +1,1 @@
-__all__ = ["fealden", "fold", "node", "seed", "sensor", "structure"]
-
-from fealden import *
+"""Fealden is software for automating the design of structure-switching biosensors."""

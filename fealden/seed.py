@@ -3,6 +3,7 @@ import random
 
 
 class Seed:
+
     """
     __init__() is the constructor for the class seed.
 
@@ -27,6 +28,7 @@ class Seed:
     def __init__(
         self, initData, recNodeName, recSeq, bindingState, seedName, maxSensorSize
     ):
+        """Initialize new Seed obj"""
         self.name = seedName
         self.head = node.SSNode(None)
         self.nodes = {}

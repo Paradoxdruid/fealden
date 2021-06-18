@@ -2,6 +2,7 @@ from . import fold
 
 
 class Sensor:
+
     """
     ---------------------------------------------------------------
     Sensor is a structure to hold and interperate the results from

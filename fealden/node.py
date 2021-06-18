@@ -2,6 +2,7 @@ from . import fold
 
 
 class Node:
+
     """
     Node is the class from which DSNode and SSNode inherit. It is a convenient place for
     getters and setters that are identical in both. It also contains a list of empty
@@ -77,6 +78,7 @@ class Node:
 
 
 class DSNode(Node):
+
     """
     ----------------------------------------------------------------------
     DSNode holds all the information for a double stranded node in a
@@ -96,6 +98,7 @@ class DSNode(Node):
     # The constant multiplier for the distance beteween bps on DS nodes
 
     def __init__(self, progenitor, length=-1):
+        """Initialize new DSNode."""
         self.upstreamSSNode = progenitor
         self.midSSNode1 = None
         self.midSSNode2 = None

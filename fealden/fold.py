@@ -4,8 +4,8 @@ import math
 
 
 class Fold:
-    """
-        The constructor for Fold.
+
+    """The constructor for Fold.
 
         Parameters:
             foldData    <- a list of fold data in the format of the second
@@ -20,6 +20,7 @@ class Fold:
     RT = 8.3144598 * (1.0 / 4184.0) * 298.0
 
     def __init__(self, foldData, deltaG, recSeq):
+        """Initialize new Fold obj."""
         self.head = node.SSNode(None)
         self.deltaG = deltaG
         self.conc = math.e ** (-self.deltaG / Fold.RT)
