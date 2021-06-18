@@ -130,8 +130,7 @@ class RNAfolder:
         mag = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
         if extra:
             return dX, dY, mag
-        else:
-            return mag
+        return mag
 
     def __len__(self):
         """Return sequence length."""

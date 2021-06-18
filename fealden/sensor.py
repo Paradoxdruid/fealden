@@ -330,11 +330,10 @@ class Sensor:
             # the concentration of all the off states
             offConc = sum([j for (i, j) in offStateInfo])
 
-            """
-            if noiseConc*10 > offConc + onConc or\
-               concWrong*10 > offConc or\
-               concWrong*10 > onConc or\
-            """
+            # if noiseConc*10 > offConc + onConc or\
+            #    concWrong*10 > offConc or\
+            #    concWrong*10 > onConc or\
+
             if noiseConc > 0 or offConc * 10 < onConc or onConc * 10 < offConc:
                 # print "too much noise, too many are wrong, or ratios are off"
                 continue
