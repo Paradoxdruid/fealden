@@ -1,10 +1,9 @@
 # fealden
 
-![gpl3.0](https://img.shields.io/github/license/Paradoxdruid/academia-admin-automation.svg "Licensed under GPL 3.0")  [![CodeFactor](https://www.codefactor.io/repository/github/paradoxdruid/fealden/badge)](https://www.codefactor.io/repository/github/paradoxdruid/fealden)  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/520de6c0a1aa463b8b12f4ddc746b4d3)](https://www.codacy.com/gh/Paradoxdruid/fealden/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Paradoxdruid/fealden&amp;utm_campaign=Badge_Grade) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
+![gpl3.0](https://img.shields.io/github/license/Paradoxdruid/academia-admin-automation.svg "Licensed under GPL 3.0")  [![CodeFactor](https://www.codefactor.io/repository/github/paradoxdruid/fealden/badge)](https://www.codefactor.io/repository/github/paradoxdruid/fealden)  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/520de6c0a1aa463b8b12f4ddc746b4d3)](https://www.codacy.com/gh/Paradoxdruid/fealden/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Paradoxdruid/fealden&amp;utm_campaign=Badge_Grade) [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/Paradoxdruid/fealden.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Paradoxdruid/fealden/context:python) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
-<!-- [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/Paradoxdruid/fealden.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Paradoxdruid/fealden/context:python) -->
+### Introduction
 
-### Introduction 
 **Fealden** is a command line tool to generate optimized structure switching DNA biosensors for fluorescent or electrochemical detection of trace amounts of a large number of biomolecule targets.  An abbreviated [bibliography](#bibliography) of works utilizing such nucleic acid-based biosensors is available below.
 
 -------------------------
