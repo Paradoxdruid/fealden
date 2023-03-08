@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 
 from . import fold, node, sensor, structure
@@ -32,13 +34,13 @@ class Seed:
         recNodeName: str,
         recSeq: str,
         bindingState: int,
-        seedName: str,
+        seedName: int,
         maxSensorSize: int,
     ) -> None:
         """Initialize new Seed obj"""
         self.name = seedName
         self.head = node.SSNode(None)
-        self.nodes: dict[str, node.Node] = {}
+        self.nodes: dict[str, node.DSNode | node.SSNode | None] = {}
         self.recNodeName = recNodeName
         self.recSeq = recSeq
         self.bindingState = bindingState
@@ -48,8 +50,8 @@ class Seed:
     def make_graph(
         self,
         data: list[str],
-        current: node.Node,
-        nodes: dict[str, node.Node],
+        current: node.SSNode | node.DSNode,
+        nodes: dict[str, node.DSNode | node.SSNode | None],
         recNodeName: str,
         recSeq: str,
     ) -> None:
@@ -127,18 +129,20 @@ class Seed:
             current.set_length(0)
             nodes[firstNodeData[1]] = current
             nodes[firstNodeData[0]] = node.DSNode(current)
+            assert not isinstance(current, node.DSNode)
             current.set_downstreamDSNode(nodes[firstNodeData[0]])
-            self.build_the_rest(data, nodes)  # type: ignore[arg-type]
+            self.build_the_rest(data, nodes)
         else:
             nodes[firstNodeData[0]] = current
             prev = current
             current = node.DSNode(prev)
+            assert not isinstance(prev, node.DSNode)
             prev.set_downstreamDSNode(current)
             nodes[firstNodeData[2]] = current
             self.build_the_rest(data[1:], nodes)
 
     def build_the_rest(
-        self, data: list[str], nodes: dict[str, node.Node | None]
+        self, data: list[str], nodes: dict[str, node.SSNode | node.DSNode | None]
     ) -> None:
         """
         build_the_rest() is an auxiliary function of make_graph.
@@ -149,14 +153,14 @@ class Seed:
         # "data" has at least one element
         currentLine = data[0].split()
         current = nodes[currentLine[0]]
-        links: list[node.Node | None] = []
+        links: list[node.Node | node.DSNode | None] = []
         for i, v in enumerate(currentLine[2:]):
             if v in nodes:
                 links.append(nodes[v])
                 if i == 2:
                     # have to set prog.
                     # the prog this node was made with is actually a child
-                    nodes[v].set_progenitor(current)
+                    nodes[v].set_progenitor(current)  # type: ignore[union-attr]
             elif v == "0":
                 links.append(None)
                 nodes[v] = None
@@ -166,6 +170,7 @@ class Seed:
             else:  # new SSNode
                 nodes[v] = node.SSNode(current)
                 links.append(nodes[v])
+        assert current is not None
         current.set_links(links)
         self.build_the_rest(data[1:], nodes)
 
@@ -198,7 +203,9 @@ class Seed:
         if len(seq) > self.maxSensorSize:
             return None
 
-        (leadingRecDat, laggingRecDat) = self.nodes[self.recNodeName].get_rec_seq_data()
+        (leadingRecDat, laggingRecDat) = self.nodes[
+            self.recNodeName
+        ].get_rec_seq_data()  # type: ignore[union-attr]
 
         # Create an RNSAstructure object
         RNA_obj = structure.RNAfolder(seq)
@@ -228,7 +235,7 @@ class Seed:
         Returns:
             Nothing
         """
-        self.nodes[self.recNodeName].set_length(
+        self.nodes[self.recNodeName].set_length(  # type: ignore[union-attr]
             len(self.recSeq)
         )  # min len of node with recSeq
         # print "rec seq node len is " + str(self.nodes[self.recNodeName].get_length())
@@ -238,7 +245,7 @@ class Seed:
 
         MIN_NODE_SIZE = 3  # to allow for loop SSNodes?
 
-        realNodes: dict[node.Node, tuple[node.Node, int]] = {}
+        realNodes: dict[str, tuple[node.Node, int]] = {}
         for n in self.nodes:
             # initializing "real" (ie rep. physical DNA) nodes to min size
             current = self.nodes[n]
@@ -268,7 +275,8 @@ class Seed:
         while size > 0:
             # increasing the size of random nodes until size limit is reached
             key = random.choice(keys)
-            (current, length) = realNodes[key]
+            (current, length) = realNodes[key]  # type: ignore[assignment]
+            assert current is not None
             if current.get_state() == fold.Fold.SEQ_STATE["DS"]:  # is DS
                 realNodes[key] = (current, length + 1)
                 size -= 2  # DS node uses 2X the number of bps
@@ -277,8 +285,8 @@ class Seed:
                 size -= 1
 
         for r in realNodes:  # assigning the new sizes to the respective nodes
-            (n, s) = realNodes[r]
-            n.set_length(s)
+            (node, s) = realNodes[r]
+            node.set_length(s)
 
     def populate_nodes(self) -> None:
         """
@@ -321,7 +329,7 @@ class Seed:
                     seq = list(self.recSeq)
             else:  # this node does not contain the recognition sequence
                 seq = self.generate_rand_DNA_string(length)
-            n.set_seq(seq)
+            n.set_seq(seq)  # type: ignore[arg-type]
 
     def generate_rand_DNA_string(self, size: int) -> list[str]:
         """
@@ -355,9 +363,11 @@ class Seed:
         (sequence, current) = prev.get_seq_and_next_node(None, 0)  # type: ignore
 
         while current is not None:
-            (seq, nxt) = current.get_seq_and_next_node(prev, len(sequence))
-            sequence.extend(seq)
-            prev = current
+            (seq, nxt) = current.get_seq_and_next_node(
+                prev, len(sequence)
+            )  # type: ignore
+            sequence.extend(seq)  # type: ignore[union-attr]
+            prev = current  # type: ignore
             current = nxt
 
         return sequence

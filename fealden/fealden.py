@@ -176,9 +176,9 @@ def generate_sensor(
     Retuns:
         sensors     <-- list of objecfs of the class 'Sensor'
     """
-    global verbose
-    if verbose:
-        print("Starting: %s, core %d" % (seed.name, core))
+    # global verbose
+    # if verbose:
+    #     print("Starting: %s, core %d" % (seed.name, core))
 
     sensors = []
     version = 0
@@ -197,8 +197,8 @@ def generate_sensor(
             sensors.append(sen)
     # print sorted(sensors)
 
-    if verbose:
-        print("Completed: %s, core %d" % (seed.name, core))
+    # if verbose:
+    #     print("Completed: %s, core %d" % (seed.name, core))
     return sensors
 
 
@@ -366,7 +366,7 @@ class Fealden:
                     recNodeName,
                     self.recSeq,
                     self.bindingState,
-                    str("Graph " + str(seedNum)),
+                    str("Graph " + str(seedNum)),  # type: ignore[arg-type]
                     self.maxSensorSize,
                 )
             )

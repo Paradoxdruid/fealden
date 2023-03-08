@@ -1,13 +1,13 @@
 repos:
   - repo: local
     hooks:
-      # - id: mypy
-      #   name: mypy
-      #   entry: mypy
-      #   language: system
-      #   types: [python]
-      #   args: [--strict, --ignore-missing-imports]
-      #   files: ^(fealden/|tests/)
+      - id: mypy
+        name: mypy
+        entry: mypy
+        language: system
+        types: [python]
+        args: [--strict, --ignore-missing-imports]
+        files: ^(fealden/|tests/)
       - id: black
         name: black
         entry: black

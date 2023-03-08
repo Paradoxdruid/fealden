@@ -45,10 +45,10 @@ class Node:
     # DSNode, so these empty methods are over-written. This is for reference, see the
     # actual implementation of these methods for their comments.
 
-    def set_links(self, links: list[DSNode | Node]) -> None:
+    def set_links(self, links: list[DSNode | Node | None]) -> None:
         ...
 
-    def set_progenitor(self, prog: DSNode | Node) -> None:
+    def set_progenitor(self, prog: DSNode | SSNode | None) -> None:
         """To be implemented in DSNode and SSNode"""
 
     def get_state(self) -> int:  # type: ignore[empty-body]
@@ -66,7 +66,7 @@ class Node:
         ...
 
     def get_distance(  # type: ignore[empty-body]
-        self, link1: SSNode | Node, link2: SSNode | Node
+        self, link1: SSNode | Node | None, link2: SSNode | Node | None
     ) -> int:
         ...
 
@@ -82,7 +82,7 @@ class Node:
         ...
 
     def get_index_to_link_dist(  # type: ignore[empty-body]
-        self, index: int, link: Node, num: int
+        self, index: int, link: Node | DSNode | None, num: int
     ) -> int:
         ...
 
@@ -124,10 +124,10 @@ class DSNode(Node):
         self.recSeqStart = -1  # set only if this node contains recSeq, is abs loc
         self.recRespStart = -1  # set only if this node contains recSeq, is abs loc
 
-    def set_midSSNode1(self, ssnode: SSNode | None) -> None:
+    def set_midSSNode1(self, ssnode: SSNode | DSNode | None) -> None:
         self.midSSNode1 = ssnode
 
-    def set_midSSNode2(self, ssnode: SSNode | None) -> None:
+    def set_midSSNode2(self, ssnode: SSNode | DSNode | None) -> None:
         self.midSSNode2 = ssnode
 
     def set_downstreamSSNode(self, ssnode: SSNode | None) -> None:
@@ -139,14 +139,14 @@ class DSNode(Node):
     def set_strand2Start(self, start: int) -> None:
         self.strand2Start = start
 
-    def set_links(self, links: list[Node]) -> None:
+    def set_links(self, links: list[DSNode | Node | None]) -> None:
         if len(links) != 3:
             print("Error in DSNode set links, wrong number of links given")
         self.midSSNode1 = links[0]
         self.midSSNode2 = links[1]
         self.downstreamSSNode = links[2]
 
-    def set_progenitor(self, prog: Node) -> None:
+    def set_progenitor(self, prog: DSNode | SSNode | None) -> None:
         self.upstreamSSNode = prog
 
     def get_state(self) -> int:  # replace with get_type()
@@ -191,7 +191,7 @@ class DSNode(Node):
         print("Error in get_seq_and_next_node() of DSNode: False progenitor given.")
         return None
 
-    def get_links(self) -> list[Node | None]:
+    def get_links(self) -> list[SSNode | Node | None]:
         """
         get_links() returns a list of all the links associated with this node.
 
@@ -212,7 +212,9 @@ class DSNode(Node):
             self.midSSNode2,
         ]
 
-    def get_distance(self, link1: SSNode | Node, link2: SSNode | Node) -> int:
+    def get_distance(
+        self, link1: SSNode | Node | None, link2: SSNode | Node | None
+    ) -> int:
         """
         get_distance() gets the distance between two links. Because this is a DSNode,
         that distance can either be the length of the node, if the links are on opposing
@@ -288,7 +290,9 @@ class DSNode(Node):
             index < (self.strand1Start + self.length) and index >= self.strand1Start
         ) or (index < (self.strand2Start + self.length) and index >= self.strand2Start)
 
-    def get_index_to_link_dist(self, index: int, link: Node, num: int) -> int:
+    def get_index_to_link_dist(
+        self, index: int, link: Node | DSNode | None, num: int
+    ) -> int:
         """
         get_index_to_link_dist() calculates the distance between an index in a node and
         a link at an end of the node. This method is only used by the distance funcs,
@@ -356,10 +360,10 @@ class SSNode(Node):
         # set only if this node contains recSeq, is rel to end of node
         self.recSeqStart = -1  # set only if this node contains recSeq
 
-    def set_downstreamDSNode(self, dsnode: DSNode) -> None:
+    def set_downstreamDSNode(self, dsnode: DSNode | SSNode | None) -> None:
         self.downstreamDSNode = dsnode
 
-    def set_links(self, links: list[DSNode | Node]) -> None:
+    def set_links(self, links: list[DSNode | Node | None]) -> None:
         if len(links) != 1:
             print("Error in SSNode set_links, wrong number of links given.")
         self.downstreamDSNode = links[0]
@@ -416,7 +420,7 @@ class SSNode(Node):
         """
         return [self.upstreamDSNode, self.downstreamDSNode]
 
-    def get_distance(self, link1: Node, link2: Node) -> int:
+    def get_distance(self, link1: Node | None, link2: Node | None) -> int:
         """
         get_distance() gets the distance between 2 links of this node.
 
@@ -472,7 +476,9 @@ class SSNode(Node):
             return True
         return False
 
-    def get_index_to_link_dist(self, index: int, link: Node, num: int) -> int:
+    def get_index_to_link_dist(
+        self, index: int, link: Node | DSNode | None, num: int
+    ) -> int:
         """
         get_index_to_link_dist() calculates the distance between an index in a node and
         a link at an end of the node. This method is only used by the dist functions,

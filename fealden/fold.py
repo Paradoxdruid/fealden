@@ -19,17 +19,21 @@ class Fold:
     SEQ_STATE = {"DS": 0, "SS": 1, "MIXED": 3}
     RT = 8.3144598 * (1.0 / 4184.0) * 298.0
 
-    def __init__(self, foldData: list[str], deltaG: float, recSeq: str) -> None:
+    def __init__(
+        self, foldData: list[list[int]], deltaG: float, recSeq: dict[str, int]
+    ) -> None:
         """Initialize new Fold obj."""
         self.head = node.SSNode(None)
         self.deltaG = deltaG
         self.conc = math.e ** (-self.deltaG / Fold.RT)
         self.foldData = foldData
         # for bp i, ptrList[i-1]= ptr to node that bp i belongs to
-        self.ptrList = [None] * len(self.foldData)
+        self.ptrList: list[None | node.SSNode | node.DSNode] = [None] * len(
+            self.foldData
+        )
         self.construct_graph_SSNode(self.head, 0)
         self.recSeq = recSeq
-        self.recSeqState = self.get_rec_seq_state()
+        self.recSeqState: int = self.get_rec_seq_state()
 
     def construct_graph_SSNode(
         self, currentNode: node.SSNode, currentIndex: int
@@ -55,12 +59,13 @@ class Fold:
                 # print i
                 isLastNode = False
                 currentNode.set_length(i)
-                nextNode = None
+                nextNode: node.DSNode | node.SSNode | None = None
                 if self.ptrList[v[1] - 1] is None:
                     nextNode = node.DSNode(currentNode)
                     self.construct_graph_DSNode_strand1(nextNode, currentIndex + i)
                 else:
                     nextNode = self.ptrList[v[1] - 1]
+                    assert not isinstance(nextNode, node.SSNode)
                     self.construct_graph_DSNode_strand2(
                         nextNode, currentIndex + i, currentNode
                     )
@@ -102,7 +107,10 @@ class Fold:
                 break
 
     def construct_graph_DSNode_strand2(
-        self, currentNode: node.DSNode, currentIndex: int, prevNode: node.SSNode
+        self,
+        currentNode: node.DSNode | None,
+        currentIndex: int,
+        prevNode: node.SSNode | node.DSNode | None,
     ) -> None:
         """
         construct_graph_DSNode_strand2 is the algorithem for building a
@@ -118,6 +126,7 @@ class Fold:
         Returns:
             Nothing
         """
+        assert currentNode is not None
         currentNode.set_strand2Start(currentIndex + 1)
         currentNode.set_midSSNode2(prevNode)
         prevPair = self.foldData[currentIndex][1] + 1
@@ -157,12 +166,15 @@ class Fold:
         node2 = self.ptrList[index2 - 1]
 
         if node1 == node2:
+            assert node1 is not None
             return node1.get_index_distance(index1, index2)
         dist = sys.maxsize
+        assert node1 is not None
         links = node1.get_links()
         for each in links:
             distToIndex2 = self.get_dist_to_index(index2, [node1], node1, each)
 
+            assert node1 is not None
             tempDist = distToIndex2 + node1.get_index_to_link_dist(index1, each, 0)
             if tempDist < dist:
                 dist = tempDist
@@ -173,7 +185,7 @@ class Fold:
         index: int,
         traversed: list[node.Node],
         previous: node.Node,
-        current: node.Node,
+        current: node.Node | node.DSNode | None,
     ) -> int:
         """
         get_dist_to_index() gets the distance from the start of the current
@@ -228,4 +240,5 @@ class Fold:
         # print "Rec seq mixed"
         #    return Fold.SEQ_STATE["MIXED"]
         # print "Rec seq " + str(startingNode.get_state())
+        assert startingNode is not None
         return startingNode.get_state()
