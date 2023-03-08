@@ -205,7 +205,7 @@ class Fold:
 
         return dist
 
-    def get_rec_seq_state(self) -> str:
+    def get_rec_seq_state(self) -> int:
         """
         get_rec_seq_state() gets the state (ie DS, SS, or Mixed) into which the rec
         sequence has folded.

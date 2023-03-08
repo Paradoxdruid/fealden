@@ -12,7 +12,7 @@ RNA_PATH = config["RNAstructure"]["Path"]
 try:
     sys.path.append(os.path.join(RNA_PATH, "exe"))
     os.environ["DATAPATH"] = os.path.join(RNA_PATH, "data_tables")
-    import RNAstructure  # type: ignore
+    import RNAstructure
 except Exception as error:
     print("RNAstructure could not be found; check config.ini")
     print(error)
@@ -44,7 +44,7 @@ class RNAfolder:
             self.get_coordinate_list(structure_num=i + 1)
             for i in range(self.number_folds)
         ]
-        self.structure_dict: dict[str, float | list[int]] = [  # type: ignore
+        self.structure_dict: list[dict[str, float | list[int]]] = [
             dict() for _ in range(self.number_folds)
         ]
         self.make_fold_dict()
@@ -62,7 +62,7 @@ class RNAfolder:
                 pairs_list.append(
                     [base + 1, self.RNAobj.GetPair(base + 1, structurenumber=i + 1)]
                 )
-            each_dict["bps"] = pairs_list
+            each_dict["bps"] = pairs_list  # type: ignore
             # dict of deltaG's with corresponding folding list for each fold
 
     def get_coordinate_list(

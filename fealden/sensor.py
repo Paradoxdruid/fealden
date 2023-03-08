@@ -17,7 +17,7 @@ class Sensor:
 
     def __init__(
         self,
-        dataFile: list[str],
+        dataFile: tuple[str, list[dict[str, float | list[int]]]],
         recSeq: dict[str, int],
         respSeq: dict[str, int],
         desRecSeqState: int,
@@ -58,7 +58,9 @@ class Sensor:
         self.baseSeq = baseSeq
         (self.tagLoc, self.score) = self.get_tag_and_score()
 
-    def interpret_data(self, data: list[str]) -> tuple[str, list[fold.Fold]]:
+    def interpret_data(
+        self, data: tuple[str, list[dict[str, float | list[int]]]]
+    ) -> tuple[str, list[fold.Fold]]:
         """
         interpret_data takes data from a the .ct file which has
         been parsed into a list of lines. It returns a tuple.
@@ -73,7 +75,7 @@ class Sensor:
         """
         seq, structureData = data[0], data[1]
         # (seq, structureData) = self.simplify_input(lines)
-        folds = []
+        folds: list[fold.Fold] = []
 
         # for v in structureData:
         #     fold = f.Fold(v['bps'], v['deltaG'], self.recSeq)
@@ -81,7 +83,9 @@ class Sensor:
         for each in structureData:
             # print(i,v)
             # print(f'fold inputs: {v[str(bps)]}, {v[str(deltaG)]}, {self.recSeq}')
-            this_fold = fold.Fold(each["bps"], each["deltaG"], self.recSeq)
+            this_fold = fold.Fold(
+                each["bps"], each["deltaG"], self.recSeq  # type: ignore
+            )
             folds.append(this_fold)
             # blah = [i.foldData for i in folds]
 
@@ -146,12 +150,14 @@ class Sensor:
                 # currently working on
                 temp = v.split()
                 strlist = temp[0:1] + temp[4:5]
-                structureData[foldIndex]["bps"].append([int(x) for x in strlist])
+                structureData[foldIndex]["bps"].append(  # type: ignore
+                    [int(x) for x in strlist]
+                )
                 # we've just appended the base pair number, and the number of the
                 # base pair it is bound to
                 if i < foldSize + 1:
                     sequence.append(temp[1])
-        return ("".join(sequence).lower(), structureData)
+        return ("".join(sequence).lower(), structureData)  # type: ignore
 
     def get_tag_and_score(self) -> tuple[int, float]:
         """
@@ -199,7 +205,7 @@ class Sensor:
         # compute validity based on criteria requiring distance
         scoreData = self.get_tagging_information()
 
-        if scoreData == (0):
+        if scoreData == 0:
             return (0, -6)
         (
             self.tagLoc,
@@ -209,7 +215,7 @@ class Sensor:
             self.wrongConc,
             self.fuzzyConc,
             self.onToOffDist,
-        ) = scoreData
+        ) = scoreData  # type: ignore
         # if sensor is valid, get optimal tagging scenario
         # score sensor based on optimal tagging scenario
         return (
@@ -218,7 +224,9 @@ class Sensor:
             * self.onToOffDist,
         )
 
-    def get_tagging_information(self):
+    def get_tagging_information(
+        self,
+    ) -> int | tuple[int, float, float, float, float, float, float]:
         """
         get_tagging_information() finds the optimal tagging situation, and returns some
         information with which it is associated. The information returned is labeled in
@@ -268,7 +276,7 @@ class Sensor:
                     and max(distances) - smallestDist >= MIN_OFF_CHANGE
                 ):
                     tagLocs.append((i + 1, distances))
-        scoreData = 0
+        scoreData: int | tuple[int, float, float, float, float, float, float] = 0
         maxAvgDeltaOnToOff = 0
         # determine if this would make a good sensor if tagged in each possible
         # location
@@ -369,7 +377,7 @@ class Sensor:
         return scoreData
 
     @staticmethod
-    def csv_header():
+    def csv_header() -> str:
         """
         csv_header() generates the header to a CSV (comma separated values) file that
         describes the values returned by csv_line().
@@ -399,7 +407,7 @@ class Sensor:
             ]
         )
 
-    def csv_line(self):
+    def csv_line(self) -> str:
         """
         csv_line() generates a string representing this sensor, which can be inserted
         into a CSV (comma separated values) file.
@@ -413,7 +421,7 @@ class Sensor:
             [
                 self.seq,
                 str(self.score),
-                self.seedName,
+                str(self.seedName),
                 str(self.tagLoc),
                 str(self.onConc),
                 str(self.offConc),
@@ -428,7 +436,7 @@ class Sensor:
             ]
         )
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """
         __repr__() generates the string representation of a sensor. It is all
         the information one might want to know about a sensor.
