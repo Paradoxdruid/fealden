@@ -1,16 +1,17 @@
-from . import node
-import sys
 import math
+import sys
+
+from . import node
 
 
 class Fold:
     """The constructor for Fold.
 
-        Parameters:
-            foldData    <- a list of fold data in the format of the second
-                            value of the tuple which is output by simplify_input.
-            deltaG      <- a float, the deltaG of the fold (we got this from unafold)
-            recSeq      <- a string, the recognition sequence
+    Parameters:
+        foldData    <- a list of fold data in the format of the second
+                        value of the tuple which is output by simplify_input.
+        deltaG      <- a float, the deltaG of the fold (we got this from unafold)
+        recSeq      <- a string, the recognition sequence
 
     """
 
@@ -18,7 +19,7 @@ class Fold:
     SEQ_STATE = {"DS": 0, "SS": 1, "MIXED": 3}
     RT = 8.3144598 * (1.0 / 4184.0) * 298.0
 
-    def __init__(self, foldData, deltaG, recSeq):
+    def __init__(self, foldData: list[str], deltaG: float, recSeq: str) -> None:
         """Initialize new Fold obj."""
         self.head = node.SSNode(None)
         self.deltaG = deltaG
@@ -30,7 +31,9 @@ class Fold:
         self.recSeq = recSeq
         self.recSeqState = self.get_rec_seq_state()
 
-    def construct_graph_SSNode(self, currentNode, currentIndex):
+    def construct_graph_SSNode(
+        self, currentNode: node.SSNode, currentIndex: int
+    ) -> None:
         """
         consturuct_graph_SSNode is the algorithem for constructing the
         fold graph given that the current node is an SSNode.
@@ -67,7 +70,9 @@ class Fold:
         if isLastNode:
             currentNode.set_length(length)
 
-    def construct_graph_DSNode_strand1(self, currentNode, currentIndex):
+    def construct_graph_DSNode_strand1(
+        self, currentNode: node.DSNode, currentIndex: int
+    ) -> None:
         """
         construct_graph_DSNode_strand1 is the algorithem for building a
         DSNode into the graph given that the base pairs in the DSNode that
@@ -96,7 +101,9 @@ class Fold:
 
                 break
 
-    def construct_graph_DSNode_strand2(self, currentNode, currentIndex, prevNode):
+    def construct_graph_DSNode_strand2(
+        self, currentNode: node.DSNode, currentIndex: int, prevNode: node.SSNode
+    ) -> None:
         """
         construct_graph_DSNode_strand2 is the algorithem for building a
         DSNode into the graph given that the base pairs in the DSNode that
@@ -129,7 +136,7 @@ class Fold:
                 # 1
                 break
 
-    def get_distance(self, index1, index2):
+    def get_distance(self, index1: int, index2: int) -> int:
         """
         get_distance (is a proper distance metric which) captures the approx. spacial
         distance between two base pairs
@@ -161,7 +168,13 @@ class Fold:
                 dist = tempDist
         return dist
 
-    def get_dist_to_index(self, index, traversed, previous, current):
+    def get_dist_to_index(
+        self,
+        index: int,
+        traversed: list[node.Node],
+        previous: node.Node,
+        current: node.Node,
+    ) -> int:
         """
         get_dist_to_index() gets the distance from the start of the current
         node to the base pair at the index referenced.
@@ -192,7 +205,7 @@ class Fold:
 
         return dist
 
-    def get_rec_seq_state(self):
+    def get_rec_seq_state(self) -> str:
         """
         get_rec_seq_state() gets the state (ie DS, SS, or Mixed) into which the rec
         sequence has folded.

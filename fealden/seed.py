@@ -1,5 +1,6 @@
-from . import sensor, node, fold, structure
 import random
+
+from . import fold, node, sensor, structure
 
 
 class Seed:
@@ -26,19 +27,32 @@ class Seed:
     """
 
     def __init__(
-        self, initData, recNodeName, recSeq, bindingState, seedName, maxSensorSize
-    ):
+        self,
+        initData: list[str],
+        recNodeName: str,
+        recSeq: str,
+        bindingState: int,
+        seedName: str,
+        maxSensorSize: int,
+    ) -> None:
         """Initialize new Seed obj"""
         self.name = seedName
         self.head = node.SSNode(None)
-        self.nodes = {}
+        self.nodes: dict[str, node.Node] = {}
         self.recNodeName = recNodeName
         self.recSeq = recSeq
         self.bindingState = bindingState
         self.maxSensorSize = maxSensorSize
         self.make_graph(initData, self.head, self.nodes, recNodeName, recSeq)
 
-    def make_graph(self, data, current, nodes, recNodeName, recSeq):
+    def make_graph(
+        self,
+        data: list[str],
+        current: node.Node,
+        nodes: dict[str, node.Node],
+        recNodeName: str,
+        recSeq: str,
+    ) -> None:
         """
         make_graph() uses the seed graph data to construct the graph. Data example:
         this:
@@ -123,7 +137,9 @@ class Seed:
             nodes[firstNodeData[2]] = current
             self.build_the_rest(data[1:], nodes)
 
-    def build_the_rest(self, data, nodes):
+    def build_the_rest(
+        self, data: list[str], nodes: dict[str, node.Node | None]
+    ) -> None:
         """
         build_the_rest() is an auxiliary function of make_graph.
         """
@@ -133,7 +149,7 @@ class Seed:
         # "data" has at least one element
         currentLine = data[0].split()
         current = nodes[currentLine[0]]
-        links = []
+        links: list[node.Node | None] = []
         for i, v in enumerate(currentLine[2:]):
             if v in nodes:
                 links.append(nodes[v])
@@ -153,7 +169,9 @@ class Seed:
         current.set_links(links)
         self.build_the_rest(data[1:], nodes)
 
-    def build_sensor(self, core, version, baseSeq):
+    def build_sensor(
+        self, core: int, version: int, baseSeq: str
+    ) -> sensor.Sensor | None:
         """
         build_sensor() first builds a 'Sensor' sequence using the 'Seed' of 'self'
         and an object of the 'random.Random' class. The sensor sequence is
@@ -192,7 +210,7 @@ class Seed:
 
         return sen
 
-    def generate_node_sizes(self, rand):
+    def generate_node_sizes(self, rand: random) -> None:
         """
         generate_node_sizes() semi-randomly determines the size of the sensor, based on
         this number, a size for each node which represets physical DNA is assigned. Each
@@ -221,7 +239,7 @@ class Seed:
 
         MIN_NODE_SIZE = 3  # to allow for loop SSNodes?
 
-        realNodes = {}
+        realNodes: dict[node.Node, tuple[node.Node, int]] = {}
         for n in self.nodes:
             # initializing "real" (ie rep. physical DNA) nodes to min size
             current = self.nodes[n]
@@ -263,7 +281,7 @@ class Seed:
             (n, s) = realNodes[r]
             n.set_length(s)
 
-    def populate_nodes(self, rand):
+    def populate_nodes(self, rand: random) -> None:
         """
         populate_nodes() populates the empty nodes with DNA bases (ie. A, C, T, or G)
         this method requires that all nodes, which are not None, have a length.
@@ -308,7 +326,7 @@ class Seed:
                 seq = self.generate_rand_DNA_string(length, rand)
             n.set_seq(seq)
 
-    def generate_rand_DNA_string(self, size, rand):
+    def generate_rand_DNA_string(self, size: int, rand: random) -> list[str]:
         """
         generate_rand_DNA_string() generates a list of pseudo-randomly selected
         DNA bases (ie. A, C, T, or G) of a specified size.
@@ -324,7 +342,7 @@ class Seed:
             return []
         return [rand.choice(["A", "T", "C", "G"]) for i in range(0, size)]
 
-    def get_sequence(self):
+    def get_sequence(self) -> str:
         """
         get_sequence() returns the sequence represented by the populated nodes of
         the seed graph up to a given node. If the nodes are not populated, the function

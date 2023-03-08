@@ -1,8 +1,8 @@
+import configparser
+import itertools
+import math
 import os
 import sys
-import configparser
-import math
-import itertools
 
 dir_path = os.path.dirname(os.path.abspath(__file__))
 config = configparser.ConfigParser()
@@ -12,7 +12,7 @@ RNA_PATH = config["RNAstructure"]["Path"]
 try:
     sys.path.append(os.path.join(RNA_PATH, "exe"))
     os.environ["DATAPATH"] = os.path.join(RNA_PATH, "data_tables")
-    import RNAstructure
+    import RNAstructure  # type: ignore
 except Exception as error:
     print("RNAstructure could not be found; check config.ini")
     print(error)
@@ -34,7 +34,7 @@ class RNAfolder:
 
     """
 
-    def __init__(self, seq):
+    def __init__(self, seq: str) -> None:
         """Initialize RNAfolder object."""
         self.seq = seq.upper()
         self.RNAobj = RNAstructure.RNA.fromString(f"{self.seq}", backbone="dna")
@@ -44,10 +44,12 @@ class RNAfolder:
             self.get_coordinate_list(structure_num=i + 1)
             for i in range(self.number_folds)
         ]
-        self.structure_dict = [dict() for _ in range(self.number_folds)]
+        self.structure_dict: dict[str, float | list[int]] = [  # type: ignore
+            dict() for _ in range(self.number_folds)
+        ]
         self.make_fold_dict()
 
-    def make_fold_dict(self):
+    def make_fold_dict(self) -> None:
         """
         make_fold_dict populates the list of dictionaries
         (self.structure_dict) defined in __init__
@@ -63,7 +65,9 @@ class RNAfolder:
             each_dict["bps"] = pairs_list
             # dict of deltaG's with corresponding folding list for each fold
 
-    def get_coordinate_list(self, h=10, w=10, structure_num=1) -> list:
+    def get_coordinate_list(
+        self, h: int = 10, w: int = 10, structure_num: int = 1
+    ) -> list[list[int]]:
         self.RNAobj.DetermineDrawingCoordinates(h, w, structure_num)
         comp = [
             [
@@ -75,8 +79,8 @@ class RNAfolder:
         return comp
 
     def dist_from_index(
-        self, index1: int, index2: int, structure_num=1
-    ) -> float:  # INDEX STARTS @ 1
+        self, index1: int, index2: int, structure_num: int = 1
+    ) -> float | tuple[int, int, float]:  # INDEX STARTS @ 1
         """
         Returns the distance between two nucleotides, index1 and index2,
         where index2 > index1 and the index values of draw_list start at 1 not 0
@@ -98,9 +102,11 @@ class RNAfolder:
             self.point_list[structure_num - 1][index1 - 1]
             + self.point_list[structure_num - 1][index2 - 1]
         )
-        return RNAfolder.dist(*points)
+        return RNAfolder.dist(*points)  # type: ignore[arg-type]
 
-    def find_best_tag(self, segment=3) -> list:
+    def find_best_tag(
+        self, segment: int = 3
+    ) -> list[dict[str, tuple[int, int, float]]]:
         tags_for_structure = []
         tail = [
             i
@@ -108,7 +114,9 @@ class RNAfolder:
             if j == "T"
         ]
         # tail = range(len(self)-segment, len(self))
-        tag_list = [dict() for _ in range(self.number_folds)]
+        tag_list: list[dict[str, tuple[int, int, float]]] = [
+            dict() for _ in range(self.number_folds)
+        ]
         prod = [[o, p] for o, p in itertools.product([1], tail[-segment:])]
         for i, a_dict in enumerate(tag_list):
             for [o, p] in prod:
@@ -117,14 +125,16 @@ class RNAfolder:
             # sort list of tuples (bp1, bp2, magnitude) based off largest magnitude
             # and set highest as the dictionary value for tag_list with the
             # structure number as the key
-            a_dict[f"{i+1}"] = sorted(
+            a_dict[f"{i+1}"] = sorted(  # type: ignore
                 tags_for_structure, reverse=True, key=lambda points: points[2]
             )[0]
 
         return tag_list
 
     @staticmethod
-    def dist(x1, y1, x2, y2, extra=False):
+    def dist(
+        x1: int, y1: int, x2: int, y2: int, extra: bool = False
+    ) -> float | tuple[int, int, float]:
         dX = x2 - x1
         dY = y2 - y1
         mag = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
@@ -132,15 +142,15 @@ class RNAfolder:
             return dX, dY, mag
         return mag
 
-    def __len__(self):
+    def __len__(self) -> int:
         """Return sequence length."""
-        return self.RNAobj.GetSequenceLength()
+        return self.RNAobj.GetSequenceLength()  # type: ignore
 
-    def __str__(self):
+    def __str__(self) -> str:
         """Return string representation."""
         return self.seq
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         """Return representation."""
         return f"RNAfolder instance\n sequence input: {self.seq}\n \
             number of structures: {self.number_folds}"

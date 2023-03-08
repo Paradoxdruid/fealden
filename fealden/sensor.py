@@ -5,7 +5,7 @@ class Sensor:
 
     """
     ---------------------------------------------------------------
-    Sensor is a structure to hold and interperate the results from
+    Sensor is a structure to hold and interpret the results from
     a unafold query, along with some other information. A Sensor
     object has a sequence, a recognition sequence and
     its location in the overall sequence, a list of Folds,
@@ -15,7 +15,15 @@ class Sensor:
     -----------------------------------------------------------------
     """
 
-    def __init__(self, dataFile, recSeq, respSeq, desRecSeqState, seedName, baseSeq):
+    def __init__(
+        self,
+        dataFile: list[str],
+        recSeq: dict[str, int],
+        respSeq: dict[str, int],
+        desRecSeqState: int,
+        seedName: int,
+        baseSeq: str,
+    ):
         """
         This is the constructor for Sensor.
         Paramaters:
@@ -41,8 +49,8 @@ class Sensor:
         self.respSeq = respSeq
         self.desRecSeqState = desRecSeqState
 
-        # Data file is passed to interperate_data, actually list
-        (self.seq, self.folds) = self.interperate_data(dataFile)
+        # Data file is passed to interpret_data, actually list
+        (self.seq, self.folds) = self.interpret_data(dataFile)
         self.onConc = 0
         self.offConc = 0
         self.noiseConc = 0
@@ -50,9 +58,9 @@ class Sensor:
         self.baseSeq = baseSeq
         (self.tagLoc, self.score) = self.get_tag_and_score()
 
-    def interperate_data(self, data):
+    def interpret_data(self, data: list[str]) -> tuple[str, list[fold.Fold]]:
         """
-        interperate_data takes data from a the .ct file which has
+        interpret_data takes data from a the .ct file which has
         been parsed into a list of lines. It returns a tuple.
         The first value is the sequence, represented as a string
         of lowercase letters. The second value is a list of Folds.
@@ -79,7 +87,9 @@ class Sensor:
 
         return (seq, folds)
 
-    def simplify_input(self, lines):
+    def simplify_input(
+        self, lines: list[str]
+    ) -> tuple[str, list[dict[str, float | list[int]]]]:
         """
         simplify_input takes the .ct file, represented as as list
         of lines, and distills from it the information we care
@@ -143,7 +153,7 @@ class Sensor:
                     sequence.append(temp[1])
         return ("".join(sequence).lower(), structureData)
 
-    def get_tag_and_score(self):
+    def get_tag_and_score(self) -> tuple[int, float]:
         """
         get_tag_and_score returns a number for the sensor, based on an arbitrary fitness
         scale, this serves as a proxy for our estimation of how well the sensor
@@ -212,7 +222,7 @@ class Sensor:
         """
         get_tagging_information() finds the optimal tagging situation, and returns some
         information with which it is associated. The information returned is labeled in
-        the "Returns:" section below and should be interperated as follows:
+        the "Returns:" section below and should be interpretd as follows:
         position               -- the location, expressed as an integer, of the base
                                     to be tagged
         onConc                 -- the (relative) concentration of sensor that's 'on.'

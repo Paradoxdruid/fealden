@@ -9,23 +9,23 @@ class Node:
     methods that are implemented in both classes.
     """
 
-    def set_length(self, length):
+    def set_length(self, length: int) -> None:
         self.length = length
 
-    def set_seq(self, seq):
+    def set_seq(self, seq: str) -> None:
         self.seq = seq
         self.length = len(seq)
 
-    def set_relLocRecStart(self, loc):
+    def set_relLocRecStart(self, loc: int) -> None:
         self.relLocRecStart = loc
 
-    def set_relLocRecEnd(self, loc):
+    def set_relLocRecEnd(self, loc: int) -> None:
         self.relLocRecEnd = loc
 
-    def get_length(self):
+    def get_length(self) -> int:
         return self.length
 
-    def get_response(self, seq):
+    def get_response(self, seq: str) -> list[str]:
         resp = {
             "A": "T",
             "T": "A",
@@ -43,38 +43,46 @@ class Node:
     # DSNode, so these empty methods are over-written. This is for reference, see the
     # actual implementation of these methods for their comments.
 
-    def set_links(self, links):
-        return
+    def set_links(self, links: list["Node"]) -> None:
+        ...
 
-    def set_progenitor(self, prog):
-        return
+    def set_progenitor(self, prog: "Node") -> None:
+        """To be implemented in DSNode and SSNode"""
 
-    def get_state(self):
-        return
+    def get_state(self) -> int:  # type: ignore[empty-body]
+        ...
 
-    def get_rec_seq_data(self):
-        return
+    def get_rec_seq_data(self) -> list[dict[str, int]]:  # type: ignore[empty-body]
+        ...
 
-    def get_seq_and_next_node(self, prog, prev_length):
-        return
+    def get_seq_and_next_node(  # type: ignore[empty-body]
+        self, prog: "Node", prev_length: int
+    ) -> tuple[str, "Node"]:
+        ...
 
-    def get_links(self):
-        return
+    def get_links(self) -> list["Node"]:  # type: ignore[empty-body]
+        ...
 
-    def get_distance(self, link1, link2):
-        return
+    def get_distance(  # type: ignore[empty-body]
+        self, link1: "Node", link2: "Node"
+    ) -> int:
+        ...
 
-    def get_index_distance(self, index1, index2):
-        return
+    def get_index_distance(  # type: ignore[empty-body]
+        self, index1: int, index2: int
+    ) -> int:
+        ...
 
-    def get_location_of(self, index):
-        return
+    def get_location_of(self, index: int) -> int:  # type: ignore[empty-body]
+        ...
 
-    def contains(self, index):
-        return
+    def contains(self, index: int) -> bool:  # type: ignore[empty-body]
+        ...
 
-    def get_index_to_link_dist(self, index, link, num):
-        return
+    def get_index_to_link_dist(  # type: ignore[empty-body]
+        self, index: int, link: "Node", num: int
+    ) -> int:
+        ...
 
 
 class DSNode(Node):
@@ -97,7 +105,7 @@ class DSNode(Node):
     DIST_MULTIPLIER = 2
     # The constant multiplier for the distance beteween bps on DS nodes
 
-    def __init__(self, progenitor, length=-1):
+    def __init__(self, progenitor: Node | None, length: int = -1):
         """Initialize new DSNode."""
         self.upstreamSSNode = progenitor
         self.midSSNode1 = None
@@ -114,35 +122,35 @@ class DSNode(Node):
         self.recSeqStart = -1  # set only if this node contains recSeq, is abs loc
         self.recRespStart = -1  # set only if this node contains recSeq, is abs loc
 
-    def set_midSSNode1(self, ssnode):
+    def set_midSSNode1(self, ssnode: "SSNode") -> None:
         self.midSSNode1 = ssnode
 
-    def set_midSSNode2(self, ssnode):
+    def set_midSSNode2(self, ssnode: "SSNode") -> None:
         self.midSSNode2 = ssnode
 
-    def set_downstreamSSNode(self, ssnode):
+    def set_downstreamSSNode(self, ssnode: "SSNode") -> None:
         self.downstreamSSNode = ssnode
 
-    def set_strand1Start(self, start):
+    def set_strand1Start(self, start: int) -> None:
         self.strand1Start = start
 
-    def set_strand2Start(self, start):
+    def set_strand2Start(self, start: int) -> None:
         self.strand2Start = start
 
-    def set_links(self, links):
+    def set_links(self, links: list[Node]) -> None:
         if len(links) != 3:
             print("Error in DSNode set links, wrong number of links given")
         self.midSSNode1 = links[0]
         self.midSSNode2 = links[1]
         self.downstreamSSNode = links[2]
 
-    def set_progenitor(self, prog):
+    def set_progenitor(self, prog: Node) -> None:
         self.upstreamSSNode = prog
 
-    def get_state(self):  # replace with get_type()
+    def get_state(self) -> int:  # replace with get_type()
         return fold.Fold.SEQ_STATE["DS"]
 
-    def get_rec_seq_data(self):
+    def get_rec_seq_data(self) -> list[dict[str, int]]:
         # print 'getting data, node size is ' + str(self.length)
         # print 'node is ' + str(self)
         recSeqSize = self.length - (self.relLocRecStart - 1 + self.relLocRecEnd - 1)
@@ -152,7 +160,9 @@ class DSNode(Node):
             {"start": self.recRespStart, "end": self.recRespStart + recSeqSize},
         ]
 
-    def get_seq_and_next_node(self, prog, prev_length):
+    def get_seq_and_next_node(
+        self, prog: Node | None, prev_length: int
+    ) -> tuple[list[str] | str, "SSNode"]:
         """
         get_seq_and_next_node() returns a tuple consisting of:
             1) The sequence which follows the given progenitor node
@@ -178,7 +188,7 @@ class DSNode(Node):
         # error, the only two upstream nodes are accounted for
         print("Error in get_seq_and_next_node() of DSNode: False progenitor given.")
 
-    def get_links(self):
+    def get_links(self) -> list[Node]:
         """
         get_links() returns a list of all the links associated with this node.
 
@@ -199,7 +209,7 @@ class DSNode(Node):
             self.midSSNode2,
         ]
 
-    def get_distance(self, link1, link2):
+    def get_distance(self, link1: "SSNode", link2: "SSNode") -> int:
         """
         get_distance() gets the distance between two links. Because this is a DSNode,
         that distance can either be the length of the node, if the links are on opposing
@@ -224,7 +234,7 @@ class DSNode(Node):
         # length of this node
         return self.length * DSNode.DIST_MULTIPLIER
 
-    def get_index_distance(self, index1, index2):
+    def get_index_distance(self, index1: int, index2: int) -> int:
         """
         get_index_distance() gets the dist between the indices of two bps on this node.
         Since this is a double stranded node, the index distance is index2-index1.
@@ -242,7 +252,7 @@ class DSNode(Node):
             * DSNode.DIST_MULTIPLIER
         )
 
-    def get_location_of(self, index):
+    def get_location_of(self, index: int) -> int:
         """
         get_location_of() obtains the location of a bp with a particular index within
         the node. This would be the distance to the strand1Start
@@ -259,7 +269,7 @@ class DSNode(Node):
             return self.length - (index - self.strand2Start)
         return index - self.strand1Start + 1
 
-    def contains(self, index):
+    def contains(self, index: int) -> bool:
         """
         contains() determines if the given indexed bp is contained in this
         node.
@@ -275,7 +285,7 @@ class DSNode(Node):
             index < (self.strand1Start + self.length) and index >= self.strand1Start
         ) or (index < (self.strand2Start + self.length) and index >= self.strand2Start)
 
-    def get_index_to_link_dist(self, index, link, num):
+    def get_index_to_link_dist(self, index: int, link: Node, num: int) -> int:
         """
         get_index_to_link_dist() calculates the distance between an index in a node and
         a link at an end of the node. This method is only used by the distance funcs,
@@ -331,7 +341,7 @@ class SSNode(Node):
     --------------------------------------------------------------------
     """
 
-    def __init__(self, progenitor, length=-1):
+    def __init__(self, progenitor: DSNode | None, length: int = -1):
         self.upstreamDSNode = progenitor
         self.downstreamDSNode = None
         self.start = -1
@@ -343,24 +353,24 @@ class SSNode(Node):
         # set only if this node contains recSeq, is rel to end of node
         self.recSeqStart = -1  # set only if this node contains recSeq
 
-    def set_downstreamDSNode(self, dsnode):
+    def set_downstreamDSNode(self, dsnode: DSNode) -> None:
         self.downstreamDSNode = dsnode
 
-    def set_links(self, links):
+    def set_links(self, links: list[DSNode]) -> None:
         if len(links) != 1:
             print("Error in SSNode set_links, wrong number of links given.")
         self.downstreamDSNode = links[0]
 
-    def set_start(self, start):
+    def set_start(self, start: int) -> None:
         self.start = start
 
-    def set_progenitor(self, prog):
+    def set_progenitor(self, prog: DSNode) -> None:
         self.upstreamDSNode = prog
 
-    def get_state(self):
+    def get_state(self) -> int:
         return fold.Fold.SEQ_STATE["SS"]
 
-    def get_rec_seq_data(self):
+    def get_rec_seq_data(self) -> list[dict[str, int]]:
         recSeqSize = self.length - (self.relLocRecStart - 1 + self.relLocRecEnd - 1)
         # print "SS rec seq size is " + str(recSeqSize)
         return [
@@ -368,7 +378,7 @@ class SSNode(Node):
             {"start": -1, "end": -1},
         ]  # response seq DNE for SSNodes
 
-    def get_seq_and_next_node(self, prog, prev_length):
+    def get_seq_and_next_node(self, prog: Node, prev_length: int) -> tuple[str, Node]:
         """
         get_seq_and_next_node() returns a tuple consisting of:
             1) The sequence which follows the given progenitor node
@@ -388,7 +398,7 @@ class SSNode(Node):
         # error, the only upstream node is accounted for
         print("Error in get_seq_and_next_node() of SSNode: False progenitor given.")
 
-    def get_links(self):
+    def get_links(self) -> list[Node]:
         """
         get_links() returns a list of all the links associatd with this node.
 
@@ -400,7 +410,7 @@ class SSNode(Node):
         """
         return [self.upstreamDSNode, self.downstreamDSNode]
 
-    def get_distance(self, link1, link2):
+    def get_distance(self, link1: Node, link2: Node) -> int:
         """
         get_distance() gets the distance between 2 links of this node.
 
@@ -412,7 +422,7 @@ class SSNode(Node):
         # this node
         return self.length
 
-    def get_index_distance(self, index1, index2):
+    def get_index_distance(self, index1: int, index2: int) -> int:
         """
         get_index_distance() gets the distance between two bps on this node based upon
         their respective indices. Since this is an SSNode, that is calculated as
@@ -427,7 +437,7 @@ class SSNode(Node):
             return -1
         return self.get_location_of(index2) - self.get_location_of(index1)
 
-    def get_location_of(self, index):
+    def get_location_of(self, index: int) -> int:
         """
         get the location of a bp with a particular index within
         the node. This would be the distance to the start of the
@@ -441,7 +451,7 @@ class SSNode(Node):
         """
         return index - self.start
 
-    def contains(self, index):
+    def contains(self, index: int) -> bool:
         """
         contains determines if the given indexed bp is contained in this
         node.
@@ -456,7 +466,7 @@ class SSNode(Node):
             return True
         return False
 
-    def get_index_to_link_dist(self, index, link, num):
+    def get_index_to_link_dist(self, index: int, link: Node, num: int) -> int:
         """
         get_index_to_link_dist() calculates the distance between an index in a node and
         a link at an end of the node. This method is only used by the dist functions,

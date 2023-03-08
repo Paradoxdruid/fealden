@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
-from . import seed
-import multiprocessing
-import copy
-from . import sensor
-import timeit
-import time
 import argparse
+import copy
+import multiprocessing
 import re
+import time
+import timeit
+
+from . import seed, sensor
 
 # __all__ = ["Fealden", "Fold", "Node", "Seed", "Sensor", "Structure"]
 
@@ -64,7 +64,7 @@ SEED_GRAPHS = {
 }
 
 
-def __main__():
+def __main__() -> None:
     """
     __main__() begins the program, parses, and validates the command line arguments.
 
@@ -161,7 +161,9 @@ def __main__():
     )
 
 
-def generate_sensor(seed, recSeq, numPossSen, core):
+def generate_sensor(
+    seed: seed.Seed, recSeq: str, numPossSen: int, core: int
+) -> list[sensor.Sensor]:
     """
     generate_sensor() gens a # of possible sensors and returns a list of valid sensors.
 
@@ -208,34 +210,34 @@ def generate_sensor(seed, recSeq, numPossSen, core):
 class Fealden:
 
     """
-        __init__() the constructor for Fealden objects. The time it takes to run the
-        program is printed to the standard out.
-        To run this method sequentially, uncomment the 8th line in the method body.
+    __init__() the constructor for Fealden objects. The time it takes to run the
+    program is printed to the standard out.
+    To run this method sequentially, uncomment the 8th line in the method body.
 
-        Parameters:
-            recSeq         <-- a string, the recognition sequence.
-            bindingState   <-- an integer, 0 or 1, representing the binding state of the
-                               recognition sequence.
-            maxSensorSize  <-- an integer, the max number of bases the user would like
-                               in their sensor.
-            minSensPerSeed <-- an integer, the minimum number of potential sensors to be
-                               generated per seed graph.
-            interactive    <-- a bool for interactive mode to store results in output
-                               attribute, rather than write to a csv file.
-            outputfile     <-- a string, filename to store results in.
-        Returns:
-            an object of the class Fealden
+    Parameters:
+        recSeq         <-- a string, the recognition sequence.
+        bindingState   <-- an integer, 0 or 1, representing the binding state of the
+                           recognition sequence.
+        maxSensorSize  <-- an integer, the max number of bases the user would like
+                           in their sensor.
+        minSensPerSeed <-- an integer, the minimum number of potential sensors to be
+                           generated per seed graph.
+        interactive    <-- a bool for interactive mode to store results in output
+                           attribute, rather than write to a csv file.
+        outputfile     <-- a string, filename to store results in.
+    Returns:
+        an object of the class Fealden
     """
 
     def __init__(
         self,
-        recSeq,
-        bindingState,
-        maxSensorSize,
-        minSensPerSeed,
-        interactive,
-        outputfile,
-    ):
+        recSeq: str,
+        bindingState: int,
+        maxSensorSize: int,
+        minSensPerSeed: int,
+        interactive: bool,
+        outputfile: str,
+    ) -> None:
         """Initialize new Fealden instance."""
         self.recSeq = recSeq
         self.bindingState = bindingState
@@ -261,7 +263,7 @@ class Fealden:
         seedSensPerProcess = posSensPerSeed / numProcess
 
         tasks = []
-        sensors = {}
+        sensors: dict[str, sensor.Sensor] = {}
 
         i = 0
         while i < numProcess:
@@ -272,17 +274,19 @@ class Fealden:
             pool.apply_async(
                 generate_sensor,
                 t,
-                callback=lambda result: sensors.update([(r.seq, r) for r in result]),
+                callback=lambda result: sensors.update(
+                    [(r.seq, r) for r in result]  # type: ignore[attr-defined]
+                ),
             )
         pool.close()
         pool.join()
 
-        s = sorted(sensors.values(), key=lambda sen: sen.score)
+        s = sorted(sensors.values(), key=lambda sen: sen.score)  # type: ignore
 
         if not interactive:
             try:
                 f = open(self.outputfile, "w")
-            except IOError:
+            except OSError:
                 print("Unable to open " + self.outputfile)
                 self.outputfile = "recent-results.csv"
                 f = open(self.outputfile, "w")
@@ -301,7 +305,7 @@ class Fealden:
                 output_list.append(str(sen))
             self.output = output_list
 
-    def parse_seed_file(self, lines):
+    def parse_seed_file(self, lines: list[str]) -> list[seed.Seed]:
         """
         parse_seed_file() is a simple method for parsing the seedGraph file.
         A seed graph file looks like this:

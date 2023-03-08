@@ -1,0 +1,64 @@
+[project]
+name = "fealden"
+authors = [{name = "Andrew J. Bonham", email = "bonham@gmail.com"}]
+readme = "README.md"
+description = "Tool for generating optimized nucleic acid biosensor sequences."
+license = {file = "LICENSE"}
+requires-python = ">=3.7"
+classifiers = [
+        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3 :: Only",
+        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "Operating System :: OS Independent",
+]
+dependencies = [
+        "pandas",
+        "numpy",
+        "scipy",
+        "plotly",
+        "xlsxwriter",
+        "xlrd",
+        "openpyxl",
+        "tqdm",
+        "pysam",
+        "biopython",
+        "seaborn",
+        "requests",
+        "dask",
+]
+keywords = ["genomics", "methylation", "DNA sequencing"]
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/Paradoxdruid/fealden"
+
+[project.optional-dependencies]
+dev = [
+    "black",
+    "pytest",
+    "pytest-mock",
+    "mypy",
+    "types-requests",
+]
+
+[tool.setuptools]
+packages = ["fealden"]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+filterwarnings = ["ignore::DeprecationWarning"]
+
+[tool.mypy]
+ignore_missing_imports = true
+strict = true
+files = "fealden/*.py"
+
+[tool.isort]
+profile = "black"
