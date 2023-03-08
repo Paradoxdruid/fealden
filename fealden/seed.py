@@ -128,7 +128,7 @@ class Seed:
             nodes[firstNodeData[1]] = current
             nodes[firstNodeData[0]] = node.DSNode(current)
             current.set_downstreamDSNode(nodes[firstNodeData[0]])
-            self.build_the_rest(data, nodes)
+            self.build_the_rest(data, nodes)  # type: ignore[arg-type]
         else:
             nodes[firstNodeData[0]] = current
             prev = current
@@ -189,9 +189,8 @@ class Seed:
         Returns:
             a Sensor object
         """
-        rand = random.Random()
-        self.generate_node_sizes(rand)
-        self.populate_nodes(rand)
+        self.generate_node_sizes()
+        self.populate_nodes()
         seq = "".join(self.get_sequence())
         seq = seq.upper()
         # some graphs may result in sequences of larger length
@@ -210,7 +209,7 @@ class Seed:
 
         return sen
 
-    def generate_node_sizes(self, rand: random) -> None:
+    def generate_node_sizes(self) -> None:
         """
         generate_node_sizes() semi-randomly determines the size of the sensor, based on
         this number, a size for each node which represets physical DNA is assigned. Each
@@ -235,7 +234,7 @@ class Seed:
         # print "rec seq node len is " + str(self.nodes[self.recNodeName].get_length())
         MAX_SIZE = self.maxSensorSize
         MIN_SIZE = 20
-        size = rand.randint(MIN_SIZE, MAX_SIZE)
+        size = random.randint(MIN_SIZE, MAX_SIZE)
 
         MIN_NODE_SIZE = 3  # to allow for loop SSNodes?
 
@@ -281,7 +280,7 @@ class Seed:
             (n, s) = realNodes[r]
             n.set_length(s)
 
-    def populate_nodes(self, rand: random) -> None:
+    def populate_nodes(self) -> None:
         """
         populate_nodes() populates the empty nodes with DNA bases (ie. A, C, T, or G)
         this method requires that all nodes, which are not None, have a length.
@@ -301,7 +300,7 @@ class Seed:
                 extra = n.get_length() - len(self.recSeq)
                 # the length not required for the recSeq
                 if extra != 0:
-                    relLocRecSeq = rand.randint(
+                    relLocRecSeq = random.randint(
                         1, extra
                     )  # the position of the recSeq in the node
                     n.set_relLocRecStart(relLocRecSeq)
@@ -311,10 +310,8 @@ class Seed:
                     # print 'rec seq size is ' + str(len(self.recSeq))
                     # print 'node size is ' + str(n.get_length())
                     # print 'node is ' + str(n)
-                    seq = self.generate_rand_DNA_string(relLocRecSeq - 1, rand)
-                    end = self.generate_rand_DNA_string(
-                        extra - (relLocRecSeq - 1), rand
-                    )
+                    seq = self.generate_rand_DNA_string(relLocRecSeq - 1)
+                    end = self.generate_rand_DNA_string(extra - (relLocRecSeq - 1))
                     seq.extend(self.recSeq)
                     seq.extend(end)
                 else:
@@ -323,10 +320,10 @@ class Seed:
                     n.set_relLocRecEnd(1)
                     seq = list(self.recSeq)
             else:  # this node does not contain the recognition sequence
-                seq = self.generate_rand_DNA_string(length, rand)
+                seq = self.generate_rand_DNA_string(length)
             n.set_seq(seq)
 
-    def generate_rand_DNA_string(self, size: int, rand: random) -> list[str]:
+    def generate_rand_DNA_string(self, size: int) -> list[str]:
         """
         generate_rand_DNA_string() generates a list of pseudo-randomly selected
         DNA bases (ie. A, C, T, or G) of a specified size.
@@ -340,7 +337,7 @@ class Seed:
         """
         if size == 0:
             return []
-        return [rand.choice(["A", "T", "C", "G"]) for i in range(0, size)]
+        return [random.choice(["A", "T", "C", "G"]) for i in range(0, size)]
 
     def get_sequence(self) -> str:
         """
@@ -355,7 +352,7 @@ class Seed:
 
         """
         prev = self.head
-        (sequence, current) = prev.get_seq_and_next_node(None, 0)
+        (sequence, current) = prev.get_seq_and_next_node(None, 0)  # type: ignore
 
         while current is not None:
             (seq, nxt) = current.get_seq_and_next_node(prev, len(sequence))

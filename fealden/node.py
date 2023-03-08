@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from . import fold
 
 
@@ -43,10 +45,10 @@ class Node:
     # DSNode, so these empty methods are over-written. This is for reference, see the
     # actual implementation of these methods for their comments.
 
-    def set_links(self, links: list["Node"]) -> None:
+    def set_links(self, links: list[DSNode | Node]) -> None:
         ...
 
-    def set_progenitor(self, prog: "Node") -> None:
+    def set_progenitor(self, prog: DSNode | Node) -> None:
         """To be implemented in DSNode and SSNode"""
 
     def get_state(self) -> int:  # type: ignore[empty-body]
@@ -55,16 +57,16 @@ class Node:
     def get_rec_seq_data(self) -> list[dict[str, int]]:  # type: ignore[empty-body]
         ...
 
-    def get_seq_and_next_node(  # type: ignore[empty-body]
-        self, prog: "Node", prev_length: int
-    ) -> tuple[str, "Node"]:
+    def get_seq_and_next_node(
+        self, prog: Node, prev_length: int
+    ) -> tuple[list[str] | str, SSNode | Node | None] | None:
         ...
 
-    def get_links(self) -> list["Node"]:  # type: ignore[empty-body]
+    def get_links(self) -> list[Node | None]:  # type: ignore[empty-body]
         ...
 
     def get_distance(  # type: ignore[empty-body]
-        self, link1: "Node", link2: "Node"
+        self, link1: SSNode | Node, link2: SSNode | Node
     ) -> int:
         ...
 
@@ -80,7 +82,7 @@ class Node:
         ...
 
     def get_index_to_link_dist(  # type: ignore[empty-body]
-        self, index: int, link: "Node", num: int
+        self, index: int, link: Node, num: int
     ) -> int:
         ...
 
@@ -108,9 +110,9 @@ class DSNode(Node):
     def __init__(self, progenitor: Node | None, length: int = -1):
         """Initialize new DSNode."""
         self.upstreamSSNode = progenitor
-        self.midSSNode1 = None
-        self.midSSNode2 = None
-        self.downstreamSSNode = None
+        self.midSSNode1: SSNode | Node | None = None
+        self.midSSNode2: SSNode | Node | None = None
+        self.downstreamSSNode: SSNode | Node | None = None
         self.strand1Start = -1
         self.strand2Start = -1
         self.length = length
@@ -122,13 +124,13 @@ class DSNode(Node):
         self.recSeqStart = -1  # set only if this node contains recSeq, is abs loc
         self.recRespStart = -1  # set only if this node contains recSeq, is abs loc
 
-    def set_midSSNode1(self, ssnode: "SSNode") -> None:
+    def set_midSSNode1(self, ssnode: SSNode | None) -> None:
         self.midSSNode1 = ssnode
 
-    def set_midSSNode2(self, ssnode: "SSNode") -> None:
+    def set_midSSNode2(self, ssnode: SSNode | None) -> None:
         self.midSSNode2 = ssnode
 
-    def set_downstreamSSNode(self, ssnode: "SSNode") -> None:
+    def set_downstreamSSNode(self, ssnode: SSNode | None) -> None:
         self.downstreamSSNode = ssnode
 
     def set_strand1Start(self, start: int) -> None:
@@ -162,7 +164,7 @@ class DSNode(Node):
 
     def get_seq_and_next_node(
         self, prog: Node | None, prev_length: int
-    ) -> tuple[list[str] | str, "SSNode"]:
+    ) -> tuple[list[str] | str, SSNode | Node | None] | None:
         """
         get_seq_and_next_node() returns a tuple consisting of:
             1) The sequence which follows the given progenitor node
@@ -187,8 +189,9 @@ class DSNode(Node):
             return (self.get_response(self.seq), self.downstreamSSNode)
         # error, the only two upstream nodes are accounted for
         print("Error in get_seq_and_next_node() of DSNode: False progenitor given.")
+        return None
 
-    def get_links(self) -> list[Node]:
+    def get_links(self) -> list[Node | None]:
         """
         get_links() returns a list of all the links associated with this node.
 
@@ -209,7 +212,7 @@ class DSNode(Node):
             self.midSSNode2,
         ]
 
-    def get_distance(self, link1: "SSNode", link2: "SSNode") -> int:
+    def get_distance(self, link1: SSNode | Node, link2: SSNode | Node) -> int:
         """
         get_distance() gets the distance between two links. Because this is a DSNode,
         that distance can either be the length of the node, if the links are on opposing
@@ -341,9 +344,9 @@ class SSNode(Node):
     --------------------------------------------------------------------
     """
 
-    def __init__(self, progenitor: DSNode | None, length: int = -1):
+    def __init__(self, progenitor: DSNode | Node | None, length: int = -1):
         self.upstreamDSNode = progenitor
-        self.downstreamDSNode = None
+        self.downstreamDSNode: Node | None = None
         self.start = -1
         self.length = length
         self.seq = ""
@@ -356,7 +359,7 @@ class SSNode(Node):
     def set_downstreamDSNode(self, dsnode: DSNode) -> None:
         self.downstreamDSNode = dsnode
 
-    def set_links(self, links: list[DSNode]) -> None:
+    def set_links(self, links: list[DSNode | Node]) -> None:
         if len(links) != 1:
             print("Error in SSNode set_links, wrong number of links given.")
         self.downstreamDSNode = links[0]
@@ -364,7 +367,7 @@ class SSNode(Node):
     def set_start(self, start: int) -> None:
         self.start = start
 
-    def set_progenitor(self, prog: DSNode) -> None:
+    def set_progenitor(self, prog: DSNode | Node | None) -> None:
         self.upstreamDSNode = prog
 
     def get_state(self) -> int:
@@ -378,7 +381,9 @@ class SSNode(Node):
             {"start": -1, "end": -1},
         ]  # response seq DNE for SSNodes
 
-    def get_seq_and_next_node(self, prog: Node, prev_length: int) -> tuple[str, Node]:
+    def get_seq_and_next_node(
+        self, prog: Node, prev_length: int
+    ) -> tuple[str, Node | None] | None:
         """
         get_seq_and_next_node() returns a tuple consisting of:
             1) The sequence which follows the given progenitor node
@@ -397,8 +402,9 @@ class SSNode(Node):
             return (self.seq, self.downstreamDSNode)
         # error, the only upstream node is accounted for
         print("Error in get_seq_and_next_node() of SSNode: False progenitor given.")
+        return None
 
-    def get_links(self) -> list[Node]:
+    def get_links(self) -> list[Node | DSNode | None]:
         """
         get_links() returns a list of all the links associatd with this node.
 

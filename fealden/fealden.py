@@ -281,7 +281,7 @@ class Fealden:
         pool.close()
         pool.join()
 
-        s = sorted(sensors.values(), key=lambda sen: sen.score)  # type: ignore
+        s = sorted(sensors.values(), key=lambda sen: sen.score)
 
         if not interactive:
             try:
