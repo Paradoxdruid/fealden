@@ -218,11 +218,18 @@ class Sensor:
         ) = scoreData  # type: ignore
         # if sensor is valid, get optimal tagging scenario
         # score sensor based on optimal tagging scenario
+        return (self.tagLoc, self.calculate_score())
+
+    def calculate_score(self) -> float:
+        """Calculate a score for the sensor based on optimal desired scenario.
+
+        This function looks to maximize change in calculated on/off distance
+        as well as minimize difference in calculated concentration of ON and OFF state.
+        """
+
         return (
-            self.tagLoc,
-            (1 - abs(self.onConc - self.offConc) / (self.onConc + self.offConc))
-            * self.onToOffDist,
-        )
+            1 - abs(self.onConc - self.offConc) / (self.onConc + self.offConc)
+        ) * self.onToOffDist
 
     def get_tagging_information(
         self,
