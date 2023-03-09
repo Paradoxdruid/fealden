@@ -231,6 +231,27 @@ class Sensor:
             1 - abs(self.onConc - self.offConc) / (self.onConc + self.offConc)
         ) * self.onToOffDist
 
+    def get_tag_locations(
+        self, MAX_ON_DIST: int, MIN_OFF_CHANGE: int
+    ) -> list[tuple[int, list[int]]]:
+        tagLocs = []
+        # get potential tagging locations and their distances in all the
+        # various folds
+        for i, v in enumerate(self.seq):
+            if (
+                v.lower() == "t"
+                and (i + 1 < self.recSeq["start"] or i + 1 > self.recSeq["end"])
+                and (i + 1 < self.respSeq["start"] or i + 1 > self.respSeq["end"])
+            ):
+                distances = [f.get_distance(1, i + 1) for f in self.folds]
+                smallestDist = min(distances)
+                if (
+                    smallestDist <= MAX_ON_DIST
+                    and max(distances) - smallestDist >= MIN_OFF_CHANGE
+                ):
+                    tagLocs.append((i + 1, distances))
+        return tagLocs
+
     def get_tagging_information(
         self,
     ) -> int | tuple[int, float, float, float, float, float, float]:
@@ -266,23 +287,8 @@ class Sensor:
         # print  "In get_tagging_information()"
         MAX_ON_DIST = 12
         MIN_OFF_CHANGE = 10
+        tagLocs = self.get_tag_locations(MAX_ON_DIST, MIN_OFF_CHANGE)
 
-        tagLocs = []
-        # get potential tagging locations and their distances in all the
-        # various folds
-        for i, v in enumerate(self.seq):
-            if (
-                v.lower() == "t"
-                and (i + 1 < self.recSeq["start"] or i + 1 > self.recSeq["end"])
-                and (i + 1 < self.respSeq["start"] or i + 1 > self.respSeq["end"])
-            ):
-                distances = [f.get_distance(1, i + 1) for f in self.folds]
-                smallestDist = min(distances)
-                if (
-                    smallestDist <= MAX_ON_DIST
-                    and max(distances) - smallestDist >= MIN_OFF_CHANGE
-                ):
-                    tagLocs.append((i + 1, distances))
         scoreData: int | tuple[int, float, float, float, float, float, float] = 0
         maxAvgDeltaOnToOff = 0
         # determine if this would make a good sensor if tagged in each possible
@@ -454,16 +460,5 @@ class Sensor:
         Returns:
             A string, the string representation of a sensor.
         """
-        # return str("\n\nSequence: " + self.seq +\
-        #            "\nScore: " + str(self.score) + \
-        #            "\nSeed Name: " + self.seedName + \
-        #            "\nTag Location: " + str(self.tagLoc) +\
-        #            "\nConc On: " + str(self.onConc) +\
-        #            "\nConc Off: " + str(self.offConc) + \
-        #            "\nConc Noise: " +  str(self.noiseConc) + \
-        #            "\nConc Wrong: " + str(self.wrongConc) + \
-        #            "\nConc Fuzzy: " + str(self.fuzzyConc) + \
-        #            "\nOn to Off Dist: " + str(self.onToOffDist) +\
-        #            "\nLength: " + str(len(self.seq))+ \
-        #            "\nNum Folds: " + str(len(self.folds)))
+
         return self.csv_line()
