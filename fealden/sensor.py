@@ -174,32 +174,32 @@ class Sensor:
             upon which the tag should be placed. y is a floating point number, the score
             of the sensor.
         """
-        # print 'in get_score()'
+
         DELTA_G_MAX_DIFFERENCE = 5
         if len(self.folds) <= 1:
-            # print 'Only one fold'
+            # 'Only one fold'
             return (0, -1)
         if self.folds[1].deltaG - DELTA_G_MAX_DIFFERENCE > self.folds[0].deltaG:
-            # print "First two folds have delta Gs which are too disparate."
+            # "First two folds have delta Gs which are too disparate."
             return (0, -2)
         if (
             len(self.folds) > 2
             and self.folds[2].deltaG - DELTA_G_MAX_DIFFERENCE > self.folds[1].deltaG
         ):
-            # print "Delta Gs of 2nd and 3rd folds are disparate."
+            # "Delta Gs of 2nd and 3rd folds are disparate."
             if self.folds[0].recSeqState == self.folds[1].recSeqState:
-                # print "Recognition sequence is in the same state in the first
+                # "Recognition sequence is in the same state in the first
                 # two folds."
                 return (0, -3)
             if (
                 self.folds[0].recSeqState != self.desRecSeqState
                 and self.folds[1].recSeqState != self.desRecSeqState
             ):
-                # print "In neither of the first two folds is the recognition
+                # "In neither of the first two folds is the recognition
                 # sequence in the desired state."
                 return (0, -4)
         if self.folds[0].deltaG > -2 or self.folds[0].deltaG < -50:
-            # print "The first has a delta G which is out of range."
+            # "The first has a delta G which is out of range."
             return (0, -5)
         # sensor has passed triage criteria
         # compute validity based on criteria requiring distance
@@ -230,6 +230,63 @@ class Sensor:
         return (
             1 - abs(self.onConc - self.offConc) / (self.onConc + self.offConc)
         ) * self.onToOffDist
+
+    def get_onstate_and_wrong(
+        self, MAX_ON_DIST: int, distances: list[int]
+    ) -> tuple[list[tuple[int, float]], float]:
+        """Helper for finding tagging information, finding onState and concWrong."""
+        onStateInfo = []
+        concWrong: float = 0.0
+        for i, d in enumerate(distances):
+            # the fold to which this distance is refering
+            currFold = self.folds[i]
+            # distance is less than or equal to on dist (ie this is a on
+            # fold)
+            if MAX_ON_DIST - d >= 0:
+                if self.desRecSeqState == currFold.recSeqState:
+                    # This is a on position and the sensor will bind the
+                    # target
+                    onStateInfo.append((d, currFold.conc))
+                else:  # this is sending the opposite of the desired signal
+                    concWrong += currFold.conc
+                    # this is only to speed it up when we don't want any
+                    # noise
+                    break
+
+        return onStateInfo, concWrong
+
+    def get_offstate_wrong_and_fuzzy(
+        self,
+        MAX_ON_DIST: int,
+        MIN_OFF_CHANGE: int,
+        distances: list[int],
+        weightedAvgOnDist: float,
+    ) -> tuple[list[tuple[int, float]], float, float]:
+        """Helper for finding tagging information, finding offState,
+        concFuzzy and concWrong."""
+        offStateInfo = []
+        concWrong = 0.0
+        concFuzzy = 0.0
+        for i, d in enumerate(distances):
+            currFold = self.folds[i]
+            if MAX_ON_DIST - d >= 0:
+                continue  # we've already delt with these folds
+            elif MIN_OFF_CHANGE <= d - weightedAvgOnDist:
+                if self.desRecSeqState != currFold.recSeqState:
+                    # This is a off position and the sensor will not bind
+                    # the target
+                    offStateInfo.append((d, currFold.conc))
+                else:  # this is sending the wrong signal
+                    concWrong += currFold.conc
+                    # this is only to speed it up when we don't want any
+                    # noise
+                    break
+            # the tag distance is not close enough nor far enough to be off
+            else:
+                concFuzzy += currFold.conc
+                # this is only to speed it up when we don't want any noise
+                break
+        return offStateInfo, concWrong, concFuzzy
 
     def get_tag_locations(
         self, MAX_ON_DIST: int, MIN_OFF_CHANGE: int
@@ -284,75 +341,48 @@ class Sensor:
             (position, onConc, offConc, noiseConc,
             concWrong, concFuzzy, weightedAvgOnToOffDist)
         """
-        # print  "In get_tagging_information()"
         MAX_ON_DIST = 12
         MIN_OFF_CHANGE = 10
         tagLocs = self.get_tag_locations(MAX_ON_DIST, MIN_OFF_CHANGE)
 
-        scoreData: int | tuple[int, float, float, float, float, float, float] = 0
         maxAvgDeltaOnToOff = 0
         # determine if this would make a good sensor if tagged in each possible
         # location
         for t in tagLocs:
-            onConc = 0
-            offConc = 0
-            noiseConc = 0
-            concWrong = 0
-            concFuzzy = 0
+            onConc = 0.0
+            offConc = 0.0
+            noiseConc = 0.0
+            concWrong = 0.0
+            concFuzzy = 0.0
 
             # position == the loation of the tag
             # distances == the physical distance between the tag
             #             and the first position in each fold
             (position, distances) = t
 
-            onStateInfo = []
-            offStateInfo = []
-            for i, d in enumerate(distances):
-                # the fold to which this distance is refering
-                currFold = self.folds[i]
-                # distance is less than or equal to on dist (ie this is a on
-                # fold)
-                if MAX_ON_DIST - d >= 0:
-                    if self.desRecSeqState == currFold.recSeqState:
-                        # This is a on position and the sensor will bind the
-                        # target
-                        onStateInfo.append((d, currFold.conc))
-                    else:  # this is sending the opposite of the desired signal
-                        concWrong += currFold.conc
-                        # this is only to speed it up when we don't want any
-                        # noise
-                        break
+            onStateInfo, new_concWrong = self.get_onstate_and_wrong(
+                MAX_ON_DIST, distances
+            )
+            concWrong += new_concWrong
 
             if onStateInfo == []:  # no on states
                 continue
 
             # total concentration of all the on states
             onConc = sum([j for (i, j) in onStateInfo])
-            #
+
             weightedAvgOnDist = sum([i * (j / onConc) for (i, j) in onStateInfo])
 
-            for i, d in enumerate(distances):
-                currFold = self.folds[i]
-                if MAX_ON_DIST - d >= 0:
-                    continue  # we've already delt with these folds
-                elif MIN_OFF_CHANGE <= d - weightedAvgOnDist:
-                    if self.desRecSeqState != currFold.recSeqState:
-                        # This is a off position and the sensor will not bind
-                        # the target
-                        offStateInfo.append((d, currFold.conc))
-                    else:  # this is sending the wrong signal
-                        concWrong += currFold.conc
-                        # this is only to speed it up when we don't want any
-                        # noise
-                        break
-                # the tag distance is not close enough nor far enough to be off
-                else:
-                    concFuzzy += currFold.conc
-                    # this is only to speed it up when we don't want any noise
-                    break
+            (
+                offStateInfo,
+                more_concWrong,
+                new_concFuzzy,
+            ) = self.get_offstate_wrong_and_fuzzy(
+                MAX_ON_DIST, MIN_OFF_CHANGE, distances, weightedAvgOnDist
+            )
+            concWrong += more_concWrong
+            concFuzzy += new_concFuzzy
 
-            # print "Fuzzy: " + str(concFuzzy)
-            # print "Wrong: " + str(concWrong)
             noiseConc = concFuzzy + concWrong
 
             if offStateInfo == []:  # no off states
@@ -366,16 +396,16 @@ class Sensor:
             #    concWrong*10 > onConc or\
 
             if noiseConc > 0 or offConc * 10 < onConc or onConc * 10 < offConc:
-                # print "too much noise, too many are wrong, or ratios are off"
+                # "too much noise, too many are wrong, or ratios are off"
                 continue
             #
             weightedAvgOnToOffDist = sum(
                 [(i - weightedAvgOnDist) * (j / offConc) for (i, j) in offStateInfo]
             )
-            # print weightedAvgOnToOffDist
+
             # CHANGE to check for best overall score
             if maxAvgDeltaOnToOff < weightedAvgOnToOffDist:
-                scoreData = (
+                return (
                     position,
                     onConc,
                     offConc,
@@ -385,9 +415,7 @@ class Sensor:
                     weightedAvgOnToOffDist,
                 )
 
-        # print tagLocs
-        # print scoreData
-        return scoreData
+        return 0
 
     @staticmethod
     def csv_header() -> str:
