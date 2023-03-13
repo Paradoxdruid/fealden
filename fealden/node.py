@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from . import fold
+from typing import ClassVar
 
 
 class Node:
@@ -104,7 +104,7 @@ class DSNode(Node):
     ---------------------------------------------------------------------
     """
 
-    DIST_MULTIPLIER = 2
+    DIST_MULTIPLIER: ClassVar[int] = 2
     # The constant multiplier for the distance beteween bps on DS nodes
 
     def __init__(self, progenitor: Node | None, length: int = -1):
@@ -150,7 +150,7 @@ class DSNode(Node):
         self.upstreamSSNode = prog
 
     def get_state(self) -> int:  # replace with get_type()
-        return fold.Fold.SEQ_STATE["DS"]
+        return 0  # DS
 
     def get_rec_seq_data(self) -> list[dict[str, int]]:
         # print 'getting data, node size is ' + str(self.length)
@@ -375,7 +375,7 @@ class SSNode(Node):
         self.upstreamDSNode = prog
 
     def get_state(self) -> int:
-        return fold.Fold.SEQ_STATE["SS"]
+        return 1  # SS
 
     def get_rec_seq_data(self) -> list[dict[str, int]]:
         recSeqSize = self.length - (self.relLocRecStart - 1 + self.relLocRecEnd - 1)

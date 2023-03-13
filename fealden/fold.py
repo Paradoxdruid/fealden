@@ -1,5 +1,6 @@
 import math
 import sys
+from typing import ClassVar
 
 from . import node
 
@@ -16,8 +17,8 @@ class Fold:
     """
 
     # the states a sequence can be in
-    SEQ_STATE = {"DS": 0, "SS": 1, "MIXED": 3}
-    RT = 8.3144598 * (1.0 / 4184.0) * 298.0
+    SEQ_STATE: dict[str, int] = {"DS": 0, "SS": 1, "MIXED": 3}
+    RT: ClassVar[float] = 8.3144598 * (1.0 / 4184.0) * 298.0
 
     def __init__(
         self, foldData: list[list[int]], deltaG: float, recSeq: dict[str, int]

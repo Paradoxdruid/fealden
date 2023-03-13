@@ -21,7 +21,7 @@ class Sensor:
         recSeq: dict[str, int],
         respSeq: dict[str, int],
         desRecSeqState: int,
-        seedName: int,
+        seedName: str,
         baseSeq: str,
     ):
         """

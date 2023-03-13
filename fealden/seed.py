@@ -34,7 +34,7 @@ class Seed:
         recNodeName: str,
         recSeq: str,
         bindingState: int,
-        seedName: int,
+        seedName: str,
         maxSensorSize: int,
     ) -> None:
         """Initialize new Seed obj"""

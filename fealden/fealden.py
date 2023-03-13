@@ -366,7 +366,7 @@ class Fealden:
                     recNodeName,
                     self.recSeq,
                     self.bindingState,
-                    str("Graph " + str(seedNum)),  # type: ignore[arg-type]
+                    str("Graph " + str(seedNum)),
                     self.maxSensorSize,
                 )
             )
