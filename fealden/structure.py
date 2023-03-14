@@ -44,7 +44,7 @@ class RNAfolder:
             self.get_coordinate_list(structure_num=i + 1)
             for i in range(self.number_folds)
         ]
-        self.structure_dict: list[dict[str, float | list[int]]] = [
+        self.structure_dict: list[dict[str, float | list[list[int]]]] = [
             dict() for _ in range(self.number_folds)
         ]
         self.make_fold_dict()
@@ -57,12 +57,12 @@ class RNAfolder:
         seq_len = len(self.RNAobj)
         for i, each_dict in enumerate(self.structure_dict):
             each_dict["deltaG"] = self.RNAobj.GetFreeEnergy(i + 1)
-            pairs_list = []
+            pairs_list: list[list[int]] = []
             for base in range(seq_len):
                 pairs_list.append(
                     [base + 1, self.RNAobj.GetPair(base + 1, structurenumber=i + 1)]
                 )
-            each_dict["bps"] = pairs_list  # type: ignore
+            each_dict["bps"] = pairs_list
             # dict of deltaG's with corresponding folding list for each fold
 
     def get_coordinate_list(

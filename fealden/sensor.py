@@ -17,7 +17,7 @@ class Sensor:
 
     def __init__(
         self,
-        dataFile: tuple[str, list[dict[str, float | list[int]]]],
+        dataFile: tuple[str, list[dict[str, float | list[list[int]]]]],
         recSeq: dict[str, int],
         respSeq: dict[str, int],
         desRecSeqState: int,
@@ -59,7 +59,7 @@ class Sensor:
         (self.tagLoc, self.score) = self.get_tag_and_score()
 
     def interpret_data(
-        self, data: tuple[str, list[dict[str, float | list[int]]]]
+        self, data: tuple[str, list[dict[str, float | list[list[int]]]]]
     ) -> tuple[str, list[fold.Fold]]:
         """
         interpret_data takes data from a the .ct file which has

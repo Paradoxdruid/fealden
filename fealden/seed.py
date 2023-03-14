@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import random
 
-from . import fold, node, sensor, structure
+from . import node, sensor, structure
 
 
 class Seed:
@@ -257,14 +257,14 @@ class Seed:
                 continue
 
             if length == -1:  # is empty
-                if current.get_state() == fold.Fold.SEQ_STATE["DS"]:  # is DS
+                if current.get_state() == 0:  # DS
                     realNodes[n] = (current, MIN_NODE_SIZE)
                     size -= MIN_NODE_SIZE * 2  # DS node uses 2X the number of bps
                 else:  # is SS
                     realNodes[n] = (current, MIN_NODE_SIZE)
                     size -= MIN_NODE_SIZE
             else:  # is not empty (ie. has recognition seq.)
-                if current.get_state() == fold.Fold.SEQ_STATE["DS"]:  # is DS
+                if current.get_state() == 0:  # DS
                     realNodes[n] = (current, length)
                     size -= 2 * length  # DS node uses 2X the number of bps
                 else:  # is SS
@@ -277,7 +277,7 @@ class Seed:
             key = random.choice(keys)
             (current, length) = realNodes[key]  # type: ignore[assignment]
             assert current is not None
-            if current.get_state() == fold.Fold.SEQ_STATE["DS"]:  # is DS
+            if current.get_state() == 0:  # DS
                 realNodes[key] = (current, length + 1)
                 size -= 2  # DS node uses 2X the number of bps
             else:  # is SS
