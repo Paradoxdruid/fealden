@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import copy
 import multiprocessing
 import re
 import time
@@ -186,9 +185,7 @@ def generate_sensor(
 
     while version < numPossSen:
         version += 1
-        # build sensor from seed copy
-        s = copy.deepcopy(seed)
-        sen = s.build_sensor(core, version, recSeq)
+        sen = seed.build_sensor(core, version, recSeq)
 
         # only keep good sensors
         if sen is None:
