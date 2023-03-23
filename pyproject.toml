@@ -39,7 +39,7 @@ dev = [
 packages = ["fealden"]
 
 [tool.setuptools.package-data]
-fealden = ["config.ini", "../README.md"]
+fealden = ["../README.md"]
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
