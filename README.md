@@ -10,9 +10,13 @@
 
 ## Dependencies
 
-**Fealden** depends upon the excellent [RNAstructure package](https://rna.urmc.rochester.edu/RNAstructure.html) from the Mathews Lab, and is written for [Python 3.9+](https://www.python.org/).  
+**Fealden** depends upon external secondary structure prediction routines.
 
-Before use, put the path to the installed RNAstructure package in `config.ini`.
+It can use either the excellent [RNAstructure package](https://rna.urmc.rochester.edu/RNAstructure.html) from the Mathews Lab, or [UNAfold v3.8 and mfold v3.6](http://www.unafold.org/) by Markham and Zuker.
+
+Fealden is written for [Python 3.9+](https://www.python.org/).  
+
+Before use, you will need to create a `.env` file following the format in [structure.py](fealden/structure.py).
 
 -------------------------
 
