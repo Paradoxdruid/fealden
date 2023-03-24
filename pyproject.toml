@@ -15,7 +15,10 @@ classifiers = [
         "Operating System :: OS Independent",
 ]
 dependencies = [
+        "python-dotenv",
         "RNAstructure @ https://rna.urmc.rochester.edu/RNAstructure.html",
+        "unafold3.8 @ http://www.unafold.org/Dinamelt/software/obtaining-unafold.php",
+        "mfold3.6 @ http://www.unafold.org/mfold/software/download-mfold.php"
 ]
 keywords = ["biosensor", "aptamer", "DNA"]
 version = "0.3.0"
