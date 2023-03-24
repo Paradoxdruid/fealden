@@ -10,7 +10,7 @@ from typing import Iterator
 class RNAfolder:
 
     """
-    RNAfolder composes an instance of the RNA class in RNAstructure
+    RNAfolder composes an instance of the RNA class using unafold/mfold routines
     and generates useful attribute data
     reflecting the secondary structure(s) of the input sequence.
 
@@ -51,6 +51,8 @@ class RNAfolder:
             hybrid_output = subprocess.run(
                 command, shell=True, capture_output=True, cwd=tmpdirname, text=True
             ).stdout
+            # with open(f"{tmpdirname}/stdin.ct") as f:
+            #     hybrid_output = f.read()
 
         return hybrid_output
 
