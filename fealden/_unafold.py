@@ -46,11 +46,13 @@ class RNAfolder:
         with tempfile.TemporaryDirectory() as tmpdirname:
             hybrid_ss_min_location = os.getenv("HYBRID_SS_MIN")
             command = f'printf "{sequence}" | {hybrid_ss_min_location} \
-                --mfold=10 --sodium=0.15 --magnesium=0.0005 --NA=DNA /dev/stdin'
+                --mfold=15 --sodium=0.15 --magnesium=0.0005 --NA=DNA /dev/stdin'
 
             hybrid_output = subprocess.run(
                 command, shell=True, capture_output=True, cwd=tmpdirname, text=True
             ).stdout
+
+            # Uncomment if your hybrid-ss-min does not output to stdout
             # with open(f"{tmpdirname}/stdin.ct") as f:
             #     hybrid_output = f.read()
 
@@ -79,6 +81,7 @@ class RNAfolder:
             lines = heading_and_lines[1:]
             lines_list.append(lines)
 
+        # Change both to [0:] if using file-base hybrid-ss-min
         return (headings[1:], lines_list[1:])
 
     @staticmethod
