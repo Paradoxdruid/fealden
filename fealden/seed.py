@@ -208,7 +208,7 @@ class Seed:
         ].get_rec_seq_data()  # type: ignore[union-attr]
 
         # Create an RNSAstructure object
-        RNA_obj = structure.RNAfolder(seq)
+        RNA_obj = structure.RNAfolder(seq)  # type:ignore
         sen_in = seq.lower(), RNA_obj.structure_dict
         sen = sensor.Sensor(
             sen_in, leadingRecDat, laggingRecDat, self.bindingState, self.name, baseSeq
@@ -229,16 +229,12 @@ class Seed:
         of other methods which comprimize the impartiality of random node size selection
         because the sensor has a size limit.
 
-        Parameters:
-            rand   <-- a pointer to an object of the class 'random'
-
         Returns:
             Nothing
         """
         self.nodes[self.recNodeName].set_length(  # type: ignore[union-attr]
             len(self.recSeq)
         )  # min len of node with recSeq
-        # print "rec seq node len is " + str(self.nodes[self.recNodeName].get_length())
         MAX_SIZE = self.maxSensorSize
         MIN_SIZE = 20
         size = random.randint(MIN_SIZE, MAX_SIZE)
@@ -293,8 +289,6 @@ class Seed:
         populate_nodes() populates the empty nodes with DNA bases (ie. A, C, T, or G)
         this method requires that all nodes, which are not None, have a length.
 
-        Parameters:
-            rand    <-- a pointer to an object of a class from the module 'random'
         Returns:
             Nothing
         """
@@ -312,18 +306,12 @@ class Seed:
                         1, extra
                     )  # the position of the recSeq in the node
                     n.set_relLocRecStart(relLocRecSeq)
-                    # print "TADA: rel loc of rec seq is " + str(relLocRecSeq)
                     n.set_relLocRecEnd(extra - (relLocRecSeq - 1) + 1)
-                    # print 'there are' + str(extra - (relLocRecSeq -1)) + 'spots left.'
-                    # print 'rec seq size is ' + str(len(self.recSeq))
-                    # print 'node size is ' + str(n.get_length())
-                    # print 'node is ' + str(n)
                     seq = self.generate_rand_DNA_string(relLocRecSeq - 1)
                     end = self.generate_rand_DNA_string(extra - (relLocRecSeq - 1))
                     seq.extend(self.recSeq)
                     seq.extend(end)
                 else:
-                    # print "TADA: relitive loc of rec seq is 1."
                     n.set_relLocRecStart(1)
                     n.set_relLocRecEnd(1)
                     seq = list(self.recSeq)

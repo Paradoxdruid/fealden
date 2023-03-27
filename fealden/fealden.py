@@ -192,7 +192,6 @@ def generate_sensor(
             continue
         if sen.score >= minScore:
             sensors.append(sen)
-    # print sorted(sensors)
 
     # if verbose:
     #     print("Completed: %s, core %d" % (seed.name, core))
@@ -254,7 +253,6 @@ class Fealden:
         # recommendedSensPerSeed < minSensPerSeed else minSensPerSeed
 
         timeZero = timeit.default_timer()
-        # '''
         numProcess = multiprocessing.cpu_count()
         pool = multiprocessing.Pool(numProcess)
         seedSensPerProcess = posSensPerSeed / numProcess
