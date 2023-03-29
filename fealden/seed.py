@@ -47,6 +47,13 @@ class Seed:
         self.maxSensorSize = maxSensorSize
         self.make_graph(initData, self.head, self.nodes, recNodeName, recSeq)
 
+    def __repr__(self) -> str:
+        nodes = {name: repr(node) for name, node in self.nodes.items()}
+        return f"Seed: name={self.name}, head={repr(self.head)},\
+        nodes={nodes}, recNodeName={self.recNodeName},\
+        recSeq={self.recSeq}, bindingState={self.bindingState},\
+        max_size={self.maxSensorSize}"
+
     def make_graph(
         self,
         data: list[str],

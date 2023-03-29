@@ -41,6 +41,9 @@ class Node:
         r = [resp[c] for c in seq]
         return r[::-1]
 
+    def __repr__(self) -> str:
+        return f"{self.__class__.__name__}: length={self.length},sequence={self.seq}"
+
     # The following methods are all empty. These methods are implemented in SSNode and
     # DSNode, so these empty methods are over-written. This is for reference, see the
     # actual implementation of these methods for their comments.
