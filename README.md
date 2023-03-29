@@ -10,13 +10,58 @@
 
 ## Dependencies
 
-**Fealden** depends upon external secondary structure prediction routines.
+**Fealden** is written for [Python 3.9+](https://www.python.org/), and depends upon external secondary structure prediction routines.
 
 It can use either the excellent [RNAstructure package](https://rna.urmc.rochester.edu/RNAstructure.html) from the Mathews Lab, or [UNAfold v3.8 and mfold v3.6](http://www.unafold.org/) by Markham and Zuker.
 
-Fealden is written for [Python 3.9+](https://www.python.org/).  
+<details>
+  <summary>Dependency Installation Tips</summary>
+
+### RNAstructure
+
+* available from the Mathews lab at <https://rna.urmc.rochester.edu/RNAstructure.html>
+* fealden requires the "text" interface version, for your operating system
+* has a python_interface available, but requires C++ compilation step
+* RNAstructure version 6.4 needs corrections in `rna_sources.h` in the `python_interface` folder:
+  * all references to `TurboFold` directory need to be replaced with `src` directory
+  * can use command `sed -i 's/TurboFold\/src\//g' rna_sources.h` to correct
+* requires installation of [swig](https://github.com/swig/swig)
+  * such as `pip install swig` or `conda install swig`
+* once `swig` installed and `rna_sources.h` corrected, enter the `python_interface` directory and run:
+  * `make swig`
+  * `make interface-from-distutils`
+  * update `.env` file (see below) with path to RNAstructure
+
+### UNAfold and mfold
+
+* version 3.8 of UNAfold is available from sourceforge: <https://rnaspace.sourceforge.net/software/unafold-3.8.tar.gz>
+* once unzipped, enter the `unafold-3.8` directory and run:
+  * `./configure --prefix=/A/GOOD/PATH/FOR/USER` (for instance, `/home/user/unafold-final`)
+  * `make`
+  * `make install`
+  * update `.env` file (see below) with path to `HYBRID_SS_MIN` in Unafold
+* You will also need the program `sir_graph` included in version 3.6 of mfold, available at <http://www.unafold.org/download/mfold-3.6.tar.gz>
+* once unzipped, enter the `mfold-3.6` directory and run:
+  * `./configure --prefix=/A/GOOD/PATH/FOR/USER` (for instance, `/home/user/mfold-final`)
+  * `make`
+  * `make install`
+  * update `.env` file (see below) with path to `SIR_GRAPH` in Unafold
+
+</details>
 
 Before use, you will need to create a `.env` file following the format in [structure.py](fealden/structure.py).
+
+<details>
+  <summary>Example .env file</summary>
+
+```env
+FEALDEN_BACKEND=mfold   # either 'mfold' or 'rnastructure'
+HYBRID_SS_MIN=/home/username/unafold-new/bin/hybrid-ss-min
+SIR_GRAPH=/home/username/mfold/bin/sir_graph
+RNASTRUCTURE=/home/username/RNAstructure
+```
+
+</details>
 
 -------------------------
 
