@@ -30,37 +30,37 @@ class Seed:
 
     def __init__(
         self,
-        initData: list[str],
-        recNodeName: str,
-        recSeq: str,
-        bindingState: int,
-        seedName: str,
-        maxSensorSize: int,
+        init_data: list[str],
+        rec_node_name: str,
+        rec_seq: str,
+        binding_state: int,
+        seed_name: str,
+        max_sensor_size: int,
     ) -> None:
         """Initialize new Seed obj"""
-        self.name = seedName
+        self.name = seed_name
         self.head = node.SSNode(None)
         self.nodes: dict[str, node.DSNode | node.SSNode | None] = {}
-        self.recNodeName = recNodeName
-        self.recSeq = recSeq
-        self.bindingState = bindingState
-        self.maxSensorSize = maxSensorSize
-        self.make_graph(initData, self.head, self.nodes, recNodeName, recSeq)
+        self.rec_node_name = rec_node_name
+        self.rec_seq = rec_seq
+        self.binding_state = binding_state
+        self.max_sensor_size = max_sensor_size
+        self.make_graph(init_data, self.head, self.nodes, rec_node_name, rec_seq)
 
     def __repr__(self) -> str:
         nodes = {name: repr(node) for name, node in self.nodes.items()}
         return f"Seed: name={self.name}, head={repr(self.head)},\
-        nodes={nodes}, recNodeName={self.recNodeName},\
-        recSeq={self.recSeq}, bindingState={self.bindingState},\
-        max_size={self.maxSensorSize}"
+        nodes={nodes}, recNodeName={self.rec_node_name},\
+        recSeq={self.rec_seq}, bindingState={self.binding_state},\
+        max_size={self.max_sensor_size}"
 
     def make_graph(
         self,
         data: list[str],
         current: node.SSNode | node.DSNode,
         nodes: dict[str, node.DSNode | node.SSNode | None],
-        recNodeName: str,
-        recSeq: str,
+        rec_node_name: str,
+        rec_seq: str,
     ) -> None:
         """
         make_graph() uses the seed graph data to construct the graph. Data example:
@@ -131,21 +131,21 @@ class Seed:
             Nothing
         """
 
-        firstNodeData = data[0].split()
-        if int(firstNodeData[0]) % 2 == 0:
+        first_node_data = data[0].split()
+        if int(first_node_data[0]) % 2 == 0:
             current.set_length(0)
-            nodes[firstNodeData[1]] = current
-            nodes[firstNodeData[0]] = node.DSNode(current)
+            nodes[first_node_data[1]] = current
+            nodes[first_node_data[0]] = node.DSNode(current)
             assert not isinstance(current, node.DSNode)
-            current.set_downstreamDSNode(nodes[firstNodeData[0]])
+            current.set_downstream_DSNode(nodes[first_node_data[0]])
             self.build_the_rest(data, nodes)
         else:
-            nodes[firstNodeData[0]] = current
+            nodes[first_node_data[0]] = current
             prev = current
             current = node.DSNode(prev)
             assert not isinstance(prev, node.DSNode)
-            prev.set_downstreamDSNode(current)
-            nodes[firstNodeData[2]] = current
+            prev.set_downstream_DSNode(current)
+            nodes[first_node_data[2]] = current
             self.build_the_rest(data[1:], nodes)
 
     def build_the_rest(
@@ -158,10 +158,10 @@ class Seed:
             # The list "data" is empty, we are out of data
             return
         # "data" has at least one element
-        currentLine = data[0].split()
-        current = nodes[currentLine[0]]
+        current_line = data[0].split()
+        current = nodes[current_line[0]]
         links: list[node.Node | node.DSNode | None] = []
-        for i, v in enumerate(currentLine[2:]):
+        for i, v in enumerate(current_line[2:]):
             if v in nodes:
                 links.append(nodes[v])
                 if i == 2:
@@ -182,7 +182,7 @@ class Seed:
         self.build_the_rest(data[1:], nodes)
 
     def build_sensor(
-        self, core: int, version: int, baseSeq: str
+        self, core: int, version: int, base_seq: str
     ) -> sensor.Sensor | None:
         """
         build_sensor() first builds a 'Sensor' sequence using the 'Seed' of 'self'
@@ -207,18 +207,23 @@ class Seed:
         seq = seq.upper()
         # some graphs may result in sequences of larger length
         # than maxSensorSize set by user
-        if len(seq) > self.maxSensorSize:
+        if len(seq) > self.max_sensor_size:
             return None
 
-        (leadingRecDat, laggingRecDat) = self.nodes[
-            self.recNodeName
+        (leading_rec_dat, lagging_rec_dat) = self.nodes[
+            self.rec_node_name
         ].get_rec_seq_data()  # type: ignore[union-attr]
 
         # Create an RNSAstructure object
         RNA_obj = structure.RNAfolder(seq)  # type:ignore
         sen_in = seq.lower(), RNA_obj.structure_dict
         sen = sensor.Sensor(
-            sen_in, leadingRecDat, laggingRecDat, self.bindingState, self.name, baseSeq
+            sen_in,
+            leading_rec_dat,
+            lagging_rec_dat,
+            self.binding_state,
+            self.name,
+            base_seq,
         )
 
         return sen
@@ -239,16 +244,16 @@ class Seed:
         Returns:
             Nothing
         """
-        self.nodes[self.recNodeName].set_length(  # type: ignore[union-attr]
-            len(self.recSeq)
+        self.nodes[self.rec_node_name].set_length(  # type: ignore[union-attr]
+            len(self.rec_seq)
         )  # min len of node with recSeq
-        MAX_SIZE = self.maxSensorSize
+        MAX_SIZE = self.max_sensor_size
         MIN_SIZE = 20
         size = random.randint(MIN_SIZE, MAX_SIZE)
 
         MIN_NODE_SIZE = 3  # to allow for loop SSNodes?
 
-        realNodes: dict[str, tuple[node.Node, int]] = {}
+        real_nodes: dict[str, tuple[node.Node, int]] = {}
         for n in self.nodes:
             # initializing "real" (ie rep. physical DNA) nodes to min size
             current = self.nodes[n]
@@ -261,34 +266,36 @@ class Seed:
 
             if length == -1:  # is empty
                 if current.get_state() == 0:  # DS
-                    realNodes[n] = (current, MIN_NODE_SIZE)
+                    real_nodes[n] = (current, MIN_NODE_SIZE)
                     size -= MIN_NODE_SIZE * 2  # DS node uses 2X the number of bps
                 else:  # is SS
-                    realNodes[n] = (current, MIN_NODE_SIZE)
+                    real_nodes[n] = (current, MIN_NODE_SIZE)
                     size -= MIN_NODE_SIZE
             else:  # is not empty (ie. has recognition seq.)
                 if current.get_state() == 0:  # DS
-                    realNodes[n] = (current, length)
+                    real_nodes[n] = (current, length)
                     size -= 2 * length  # DS node uses 2X the number of bps
                 else:  # is SS
-                    realNodes[n] = (current, length)
+                    real_nodes[n] = (current, length)
                     size -= length
 
-        keys = [n for n in realNodes]  # a list of the 'key' names in the realNodes dict
+        keys = [
+            n for n in real_nodes
+        ]  # a list of the 'key' names in the realNodes dict
         while size > 0:
             # increasing the size of random nodes until size limit is reached
             key = random.choice(keys)
-            (current, length) = realNodes[key]  # type: ignore[assignment]
+            (current, length) = real_nodes[key]  # type: ignore[assignment]
             assert current is not None
             if current.get_state() == 0:  # DS
-                realNodes[key] = (current, length + 1)
+                real_nodes[key] = (current, length + 1)
                 size -= 2  # DS node uses 2X the number of bps
             else:  # is SS
-                realNodes[key] = (current, length + 1)
+                real_nodes[key] = (current, length + 1)
                 size -= 1
 
-        for r in realNodes:  # assigning the new sizes to the respective nodes
-            (node, s) = realNodes[r]
+        for r in real_nodes:  # assigning the new sizes to the respective nodes
+            (node, s) = real_nodes[r]
             node.set_length(s)
 
     def populate_nodes(self) -> None:
@@ -305,23 +312,23 @@ class Seed:
             length = n.get_length()
             seq = []
             # if this is the node with the recognition sequence we treat it differently
-            if n == self.nodes[self.recNodeName]:  # is node with recognition sequence
-                extra = n.get_length() - len(self.recSeq)
+            if n == self.nodes[self.rec_node_name]:  # is node with recognition sequence
+                extra = n.get_length() - len(self.rec_seq)
                 # the length not required for the recSeq
                 if extra != 0:
                     relLocRecSeq = random.randint(
                         1, extra
                     )  # the position of the recSeq in the node
-                    n.set_relLocRecStart(relLocRecSeq)
-                    n.set_relLocRecEnd(extra - (relLocRecSeq - 1) + 1)
+                    n.set_rel_loc_rec_start(relLocRecSeq)
+                    n.set_rel_loc_rec_end(extra - (relLocRecSeq - 1) + 1)
                     seq = self.generate_rand_DNA_string(relLocRecSeq - 1)
                     end = self.generate_rand_DNA_string(extra - (relLocRecSeq - 1))
-                    seq.extend(self.recSeq)
+                    seq.extend(self.rec_seq)
                     seq.extend(end)
                 else:
-                    n.set_relLocRecStart(1)
-                    n.set_relLocRecEnd(1)
-                    seq = list(self.recSeq)
+                    n.set_rel_loc_rec_start(1)
+                    n.set_rel_loc_rec_end(1)
+                    seq = list(self.rec_seq)
             else:  # this node does not contain the recognition sequence
                 seq = self.generate_rand_DNA_string(length)
             n.set_seq(seq)  # type: ignore[arg-type]

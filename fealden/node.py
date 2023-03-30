@@ -18,11 +18,11 @@ class Node:
         self.seq = seq
         self.length = len(seq)
 
-    def set_relLocRecStart(self, loc: int) -> None:
-        self.relLocRecStart = loc
+    def set_rel_loc_rec_start(self, loc: int) -> None:
+        self.rel_loc_rec_start = loc
 
-    def set_relLocRecEnd(self, loc: int) -> None:
-        self.relLocRecEnd = loc
+    def set_rel_loc_rec_end(self, loc: int) -> None:
+        self.rel_loc_rec_end = loc
 
     def get_length(self) -> int:
         return self.length
@@ -112,54 +112,56 @@ class DSNode(Node):
 
     def __init__(self, progenitor: Node | None, length: int = -1):
         """Initialize new DSNode."""
-        self.upstreamSSNode = progenitor
-        self.midSSNode1: SSNode | Node | None = None
-        self.midSSNode2: SSNode | Node | None = None
-        self.downstreamSSNode: SSNode | Node | None = None
-        self.strand1Start = -1
-        self.strand2Start = -1
+        self.upstream_SSNode = progenitor
+        self.mid_SSNode1: SSNode | Node | None = None
+        self.mid_SSNode2: SSNode | Node | None = None
+        self.downstream_SSNode: SSNode | Node | None = None
+        self.strand_1_start = -1
+        self.strand_2_start = -1
         self.length = length
         self.seq = ""
         # set only if this node contains recSeq, is rel to begining of node
-        self.relLocRecStart = -1
-        self.relLocRecEnd = -1
+        self.rel_loc_rec_start = -1
+        self.rel_loc_rec_end = -1
         # set only if this node contains recSeq, is rel to end of node
-        self.recSeqStart = -1  # set only if this node contains recSeq, is abs loc
-        self.recRespStart = -1  # set only if this node contains recSeq, is abs loc
+        self.rec_seq_start = -1  # set only if this node contains recSeq, is abs loc
+        self.rec_resp_start = -1  # set only if this node contains recSeq, is abs loc
 
-    def set_midSSNode1(self, ssnode: SSNode | DSNode | None) -> None:
-        self.midSSNode1 = ssnode
+    def set_mid_SSNode1(self, ssnode: SSNode | DSNode | None) -> None:
+        self.mid_SSNode1 = ssnode
 
-    def set_midSSNode2(self, ssnode: SSNode | DSNode | None) -> None:
-        self.midSSNode2 = ssnode
+    def set_mid_SSNode2(self, ssnode: SSNode | DSNode | None) -> None:
+        self.mid_SSNode2 = ssnode
 
-    def set_downstreamSSNode(self, ssnode: SSNode | None) -> None:
-        self.downstreamSSNode = ssnode
+    def set_downstream_SSNode(self, ssnode: SSNode | None) -> None:
+        self.downstream_SSNode = ssnode
 
-    def set_strand1Start(self, start: int) -> None:
-        self.strand1Start = start
+    def set_strand_1_start(self, start: int) -> None:
+        self.strand_1_start = start
 
-    def set_strand2Start(self, start: int) -> None:
-        self.strand2Start = start
+    def set_strand_2_start(self, start: int) -> None:
+        self.strand_2_start = start
 
     def set_links(self, links: list[DSNode | Node | None]) -> None:
         if len(links) != 3:
             print("Error in DSNode set links, wrong number of links given")
-        self.midSSNode1 = links[0]
-        self.midSSNode2 = links[1]
-        self.downstreamSSNode = links[2]
+        self.mid_SSNode1 = links[0]
+        self.mid_SSNode2 = links[1]
+        self.downstream_SSNode = links[2]
 
     def set_progenitor(self, prog: DSNode | SSNode | None) -> None:
-        self.upstreamSSNode = prog
+        self.upstream_SSNode = prog
 
     def get_state(self) -> int:  # replace with get_type()
         return 0  # DS
 
     def get_rec_seq_data(self) -> list[dict[str, int]]:
-        recSeqSize = self.length - (self.relLocRecStart - 1 + self.relLocRecEnd - 1)
+        rec_seq_size = self.length - (
+            self.rel_loc_rec_start - 1 + self.rel_loc_rec_end - 1
+        )
         return [
-            {"start": self.recSeqStart, "end": self.recSeqStart + recSeqSize},
-            {"start": self.recRespStart, "end": self.recRespStart + recSeqSize},
+            {"start": self.rec_seq_start, "end": self.rec_seq_start + rec_seq_size},
+            {"start": self.rec_resp_start, "end": self.rec_resp_start + rec_seq_size},
         ]
 
     def get_seq_and_next_node(
@@ -177,16 +179,20 @@ class DSNode(Node):
         Returns:
             (seq, next)     <-- a tuple with the properties described above
         """
-        if prog == self.upstreamSSNode:
-            self.strand1Start = prev_length + 1
-            if self.relLocRecStart != -1:  # this node contains the recognition sequence
-                self.recSeqStart = self.strand1Start + self.relLocRecStart - 1
-            return (self.seq, self.midSSNode1)
-        if prog == self.midSSNode2:
-            self.strand2Start = prev_length + 1
-            if self.relLocRecEnd != -1:  # this node contains the recognition sequence
-                self.recRespStart = self.strand2Start + self.relLocRecEnd
-            return (self.get_response(self.seq), self.downstreamSSNode)
+        if prog == self.upstream_SSNode:
+            self.strand_1_start = prev_length + 1
+            if (
+                self.rel_loc_rec_start != -1
+            ):  # this node contains the recognition sequence
+                self.rec_seq_start = self.strand_1_start + self.rel_loc_rec_start - 1
+            return (self.seq, self.mid_SSNode1)
+        if prog == self.mid_SSNode2:
+            self.strand_2_start = prev_length + 1
+            if (
+                self.rel_loc_rec_end != -1
+            ):  # this node contains the recognition sequence
+                self.rec_resp_start = self.strand_2_start + self.rel_loc_rec_end
+            return (self.get_response(self.seq), self.downstream_SSNode)
         # error, the only two upstream nodes are accounted for
         print("Error in get_seq_and_next_node() of DSNode: False progenitor given.")
         return None
@@ -206,10 +212,10 @@ class DSNode(Node):
                                     downstream SSNode were this DSNode unzipped).
         """
         return [
-            self.upstreamSSNode,
-            self.downstreamSSNode,
-            self.midSSNode1,
-            self.midSSNode2,
+            self.upstream_SSNode,
+            self.downstream_SSNode,
+            self.mid_SSNode1,
+            self.mid_SSNode2,
         ]
 
     def get_distance(
@@ -227,10 +233,10 @@ class DSNode(Node):
             An integer, the distance according to the used metric.
         """
         if (
-            (link1 is self.upstreamSSNode and link2 is self.downstreamSSNode)
-            or (link2 is self.upstreamSSNode and link1 is self.downstreamSSNode)
-            or (link1 is self.midSSNode1 and link2 is self.midSSNode2)
-            or (link2 is self.midSSNode1 and link1 is self.midSSNode2)
+            (link1 is self.upstream_SSNode and link2 is self.downstream_SSNode)
+            or (link2 is self.upstream_SSNode and link1 is self.downstream_SSNode)
+            or (link1 is self.mid_SSNode1 and link2 is self.mid_SSNode2)
+            or (link2 is self.mid_SSNode1 and link1 is self.mid_SSNode2)
         ):
             # both links are on the same side of current node, return distance as 2
             # to account for the two base pairs that link up the two nodes
@@ -270,9 +276,9 @@ class DSNode(Node):
         Returns:
             an integer, the location of the bp
         """
-        if index > (self.strand1Start + self.length):
-            return self.length - (index - self.strand2Start)
-        return index - self.strand1Start + 1
+        if index > (self.strand_1_start + self.length):
+            return self.length - (index - self.strand_2_start)
+        return index - self.strand_1_start + 1
 
     def contains(self, index: int) -> bool:
         """
@@ -287,8 +293,10 @@ class DSNode(Node):
         """
 
         return (
-            index < (self.strand1Start + self.length) and index >= self.strand1Start
-        ) or (index < (self.strand2Start + self.length) and index >= self.strand2Start)
+            index < (self.strand_1_start + self.length) and index >= self.strand_1_start
+        ) or (
+            index < (self.strand_2_start + self.length) and index >= self.strand_2_start
+        )
 
     def get_index_to_link_dist(
         self, index: int, link: Node | DSNode | None, num: int
@@ -326,9 +334,9 @@ class DSNode(Node):
             print("Bad Index: DSNode get_index_to_link_dist from node.py")
             return -1
         loc = self.get_location_of(index)
-        if link is self.upstreamSSNode or link is self.downstreamSSNode:
+        if link is self.upstream_SSNode or link is self.downstream_SSNode:
             return (loc - 1 + num) * DSNode.DIST_MULTIPLIER
-        if link is self.midSSNode1 or link is self.midSSNode2:
+        if link is self.mid_SSNode1 or link is self.mid_SSNode2:
             return (self.length - loc + num) * DSNode.DIST_MULTIPLIER
         # bad link
         print("Bad Link: DSNode get_index_to_link_dist node.py")
@@ -349,38 +357,40 @@ class SSNode(Node):
     """
 
     def __init__(self, progenitor: DSNode | Node | None, length: int = -1):
-        self.upstreamDSNode = progenitor
-        self.downstreamDSNode: Node | None = None
+        self.upstream_DSNode = progenitor
+        self.downstream_DSNode: Node | None = None
         self.start = -1
         self.length = length
         self.seq = ""
         # set only if this node contains recSeq, is rel to start of node
-        self.relLocRecStart = -1
-        self.relLocRecEnd = -1
+        self.rel_loc_rec_start = -1
+        self.rel_loc_rec_end = -1
         # set only if this node contains recSeq, is rel to end of node
-        self.recSeqStart = -1  # set only if this node contains recSeq
+        self.rec_seq_start = -1  # set only if this node contains recSeq
 
-    def set_downstreamDSNode(self, dsnode: DSNode | SSNode | None) -> None:
-        self.downstreamDSNode = dsnode
+    def set_downstream_DSNode(self, dsnode: DSNode | SSNode | None) -> None:
+        self.downstream_DSNode = dsnode
 
     def set_links(self, links: list[DSNode | Node | None]) -> None:
         if len(links) != 1:
             print("Error in SSNode set_links, wrong number of links given.")
-        self.downstreamDSNode = links[0]
+        self.downstream_DSNode = links[0]
 
     def set_start(self, start: int) -> None:
         self.start = start
 
     def set_progenitor(self, prog: DSNode | Node | None) -> None:
-        self.upstreamDSNode = prog
+        self.upstream_DSNode = prog
 
     def get_state(self) -> int:
         return 1  # SS
 
     def get_rec_seq_data(self) -> list[dict[str, int]]:
-        recSeqSize = self.length - (self.relLocRecStart - 1 + self.relLocRecEnd - 1)
+        rec_seq_size = self.length - (
+            self.rel_loc_rec_start - 1 + self.rel_loc_rec_end - 1
+        )
         return [
-            {"start": self.recSeqStart, "end": self.recSeqStart + recSeqSize},
+            {"start": self.rec_seq_start, "end": self.rec_seq_start + rec_seq_size},
             {"start": -1, "end": -1},
         ]  # response seq DNE for SSNodes
 
@@ -398,11 +408,13 @@ class SSNode(Node):
         Returns:
             (seq, next)     <-- a tuple with the properties described above
         """
-        if prog == self.upstreamDSNode:
+        if prog == self.upstream_DSNode:
             self.start = prev_length + 1
-            if self.relLocRecStart != -1:  # this node contains the recognition sequence
-                self.recSeqStart = self.start + self.relLocRecStart - 1
-            return (self.seq, self.downstreamDSNode)
+            if (
+                self.rel_loc_rec_start != -1
+            ):  # this node contains the recognition sequence
+                self.rec_seq_start = self.start + self.rel_loc_rec_start - 1
+            return (self.seq, self.downstream_DSNode)
         # error, the only upstream node is accounted for
         print("Error in get_seq_and_next_node() of SSNode: False progenitor given.")
         return None
@@ -417,7 +429,7 @@ class SSNode(Node):
             [l1,l2] <-- a list wherein the first link is to the upstream DSNode
                         and the second link is to the downstream DSNode
         """
-        return [self.upstreamDSNode, self.downstreamDSNode]
+        return [self.upstream_DSNode, self.downstream_DSNode]
 
     def get_distance(self, link1: Node | None, link2: Node | None) -> int:
         """
@@ -510,18 +522,18 @@ class SSNode(Node):
         if not self.contains(index):  # bad index
             print("Bad Index: SSNode get_index_to_link_dist from node.py")
             return -1
-        distToDownstream = self.start + self.length - index - 1 + num
-        distToUpstream = index - self.start + num
-        if link is self.upstreamDSNode and link is self.downstreamDSNode:  # loop node
+        dist_to_downstream = self.start + self.length - index - 1 + num
+        dist_to_upstream = index - self.start + num
+        if link is self.upstream_DSNode and link is self.downstream_DSNode:  # loop node
             return (
-                distToUpstream
-                if distToUpstream < distToDownstream
-                else distToDownstream
+                dist_to_upstream
+                if dist_to_upstream < dist_to_downstream
+                else dist_to_downstream
             )
-        if link is self.upstreamDSNode:
-            return distToUpstream
-        if link is self.downstreamDSNode:
-            return distToDownstream
+        if link is self.upstream_DSNode:
+            return dist_to_upstream
+        if link is self.downstream_DSNode:
+            return dist_to_downstream
         # bad link
         print("Bad Link: SSNode get_index_to_link_dist from node.py")
         return -2

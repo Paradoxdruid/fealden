@@ -21,28 +21,28 @@ class Fold:
     RT: ClassVar[float] = 8.3144598 * (1.0 / 4184.0) * 298.0
 
     def __init__(
-        self, foldData: list[list[int]], deltaG: float, recSeq: dict[str, int]
+        self, fold_data: list[list[int]], deltaG: float, rec_seq: dict[str, int]
     ) -> None:
         """Initialize new Fold obj."""
         self.head = node.SSNode(None)
         self.deltaG = deltaG
         self.conc = math.e ** (-self.deltaG / Fold.RT)
-        self.foldData = foldData
+        self.fold_data = fold_data
         # for bp i, ptrList[i-1]= ptr to node that bp i belongs to
-        self.ptrList: list[None | node.SSNode | node.DSNode] = [None] * len(
-            self.foldData
+        self.ptr_list: list[None | node.SSNode | node.DSNode] = [None] * len(
+            self.fold_data
         )
         self.construct_graph_SSNode(self.head, 0)
-        self.recSeq = recSeq
-        self.recSeqState: int = self.get_rec_seq_state()
+        self.rec_seq = rec_seq
+        self.rec_seq_state: int = self.get_rec_seq_state()
 
     def __repr__(self) -> str:
         return f"Fold: head={repr(self.head)}, deltaG={self.deltaG}, conc={self.conc},\
- foldData={self.foldData}, ptrList={self.ptrList}, recSeq={self.recSeq},\
- recSeqState={self.recSeqState}"
+ foldData={self.fold_data}, ptrList={self.ptr_list}, recSeq={self.rec_seq},\
+ recSeqState={self.rec_seq_state}"
 
     def construct_graph_SSNode(
-        self, currentNode: node.SSNode, currentIndex: int
+        self, current_node: node.SSNode, current_index: int
     ) -> None:
         """
         consturuct_graph_SSNode is the algorithem for constructing the
@@ -54,34 +54,34 @@ class Fold:
         Returns:
             Nothing
         """
-        currentNode.set_start(currentIndex + 1)
-        isLastNode = True
+        current_node.set_start(current_index + 1)
+        is_last_node = True
         length = 0
-        for i, v in enumerate(self.foldData[currentIndex::]):
+        for i, v in enumerate(self.fold_data[current_index::]):
             if v[1] == 0:
-                self.ptrList[i + currentIndex] = currentNode
+                self.ptr_list[i + current_index] = current_node
                 length = i + 1  # keep track in case this is the last node
             else:
-                isLastNode = False
-                currentNode.set_length(i)
-                nextNode: node.DSNode | node.SSNode | None = None
-                if self.ptrList[v[1] - 1] is None:
-                    nextNode = node.DSNode(currentNode)
-                    self.construct_graph_DSNode_strand1(nextNode, currentIndex + i)
+                is_last_node = False
+                current_node.set_length(i)
+                next_node: node.DSNode | node.SSNode | None = None
+                if self.ptr_list[v[1] - 1] is None:
+                    next_node = node.DSNode(current_node)
+                    self.construct_graph_DSNode_strand1(next_node, current_index + i)
                 else:
-                    nextNode = self.ptrList[v[1] - 1]
-                    assert not isinstance(nextNode, node.SSNode)
+                    next_node = self.ptr_list[v[1] - 1]
+                    assert not isinstance(next_node, node.SSNode)
                     self.construct_graph_DSNode_strand2(
-                        nextNode, currentIndex + i, currentNode
+                        next_node, current_index + i, current_node
                     )
 
-                currentNode.set_downstreamDSNode(nextNode)
+                current_node.set_downstream_DSNode(next_node)
                 break
-        if isLastNode:
-            currentNode.set_length(length)
+        if is_last_node:
+            current_node.set_length(length)
 
     def construct_graph_DSNode_strand1(
-        self, currentNode: node.DSNode, currentIndex: int
+        self, current_node: node.DSNode, current_index: int
     ) -> None:
         """
         construct_graph_DSNode_strand1 is the algorithem for building a
@@ -96,26 +96,26 @@ class Fold:
         Returns:
             Nothing
         """
-        currentNode.set_strand1Start(currentIndex + 1)
-        prevPair = self.foldData[currentIndex][1] + 1
-        for i, v in enumerate(self.foldData[currentIndex::]):
-            if v[1] == prevPair - 1:
-                self.ptrList[i + currentIndex] = currentNode
-                self.ptrList[prevPair - 2] = currentNode
-                prevPair -= 1
+        current_node.set_strand_1_start(current_index + 1)
+        prev_pair = self.fold_data[current_index][1] + 1
+        for i, v in enumerate(self.fold_data[current_index::]):
+            if v[1] == prev_pair - 1:
+                self.ptr_list[i + current_index] = current_node
+                self.ptr_list[prev_pair - 2] = current_node
+                prev_pair -= 1
             else:
-                currentNode.set_length(i)
-                nextNode = node.SSNode(currentNode)
-                self.construct_graph_SSNode(nextNode, currentIndex + i)
-                currentNode.set_midSSNode1(nextNode)
+                current_node.set_length(i)
+                next_node = node.SSNode(current_node)
+                self.construct_graph_SSNode(next_node, current_index + i)
+                current_node.set_mid_SSNode1(next_node)
 
                 break
 
     def construct_graph_DSNode_strand2(
         self,
-        currentNode: node.DSNode | None,
-        currentIndex: int,
-        prevNode: node.SSNode | node.DSNode | None,
+        current_node: node.DSNode | None,
+        current_index: int,
+        prev_node: node.SSNode | node.DSNode | None,
     ) -> None:
         """
         construct_graph_DSNode_strand2 is the algorithem for building a
@@ -131,21 +131,21 @@ class Fold:
         Returns:
             Nothing
         """
-        assert currentNode is not None
-        currentNode.set_strand2Start(currentIndex + 1)
-        currentNode.set_midSSNode2(prevNode)
-        prevPair = self.foldData[currentIndex][1] + 1
-        for i, v in enumerate(self.foldData[currentIndex::]):
-            if (v[1] == prevPair - 1) and (v[1] != 0):
+        assert current_node is not None
+        current_node.set_strand_2_start(current_index + 1)
+        current_node.set_mid_SSNode2(prev_node)
+        prev_pair = self.fold_data[current_index][1] + 1
+        for i, v in enumerate(self.fold_data[current_index::]):
+            if (v[1] == prev_pair - 1) and (v[1] != 0):
                 # self.ptrList[i+currentIndex] = currentNode
                 # #already set when building strand 1
                 # self.ptrList[prevPair-2] = currentNode #already set when
                 # building strand 1
-                prevPair -= 1
+                prev_pair -= 1
             else:
-                nextNode = node.SSNode(currentNode)
-                self.construct_graph_SSNode(nextNode, currentIndex + i)
-                currentNode.set_downstreamSSNode(nextNode)
+                next_node = node.SSNode(current_node)
+                self.construct_graph_SSNode(next_node, current_index + i)
+                current_node.set_downstream_SSNode(next_node)
                 # don't set length, it's already been set while building strand
                 # 1
                 break
@@ -167,8 +167,8 @@ class Fold:
             index1 = index2
             index2 = index1
 
-        node1 = self.ptrList[index1 - 1]
-        node2 = self.ptrList[index2 - 1]
+        node1 = self.ptr_list[index1 - 1]
+        node2 = self.ptr_list[index2 - 1]
 
         if node1 == node2:
             assert node1 is not None
@@ -177,12 +177,12 @@ class Fold:
         assert node1 is not None
         links = node1.get_links()
         for each in links:
-            distToIndex2 = self.get_dist_to_index(index2, [node1], node1, each)
+            dist_to_index_2 = self.get_dist_to_index(index2, [node1], node1, each)
 
             assert node1 is not None
-            tempDist = distToIndex2 + node1.get_index_to_link_dist(index1, each, 0)
-            if tempDist < dist:
-                dist = tempDist
+            temp_dist = dist_to_index_2 + node1.get_index_to_link_dist(index1, each, 0)
+            if temp_dist < dist:
+                dist = temp_dist
         return dist
 
     def get_dist_to_index(
@@ -214,11 +214,11 @@ class Fold:
         for each in links:
             if each in traversed:
                 continue
-            tempDist = current.get_distance(previous, each) + self.get_dist_to_index(
+            temp_dist = current.get_distance(previous, each) + self.get_dist_to_index(
                 index, [j for j in traversed], current, each
             )
-            if tempDist < dist:
-                dist = tempDist
+            if temp_dist < dist:
+                dist = temp_dist
 
         return dist
 
@@ -232,9 +232,11 @@ class Fold:
         Returns:
             the state  <- an item from the Fold.SEQ_STATE list.
         """
-        recSeqPtrList = self.ptrList[self.recSeq["start"] - 1 : self.recSeq["end"] - 1]
-        assert recSeqPtrList != []
-        startingNode = recSeqPtrList[0]
+        rec_seq_ptr_list = self.ptr_list[
+            self.rec_seq["start"] - 1 : self.rec_seq["end"] - 1
+        ]
+        assert rec_seq_ptr_list != []
+        starting_node = rec_seq_ptr_list[0]
 
         # TODO Implement Mixed Req Seqs
         # recSeqMixed = False
@@ -244,5 +246,5 @@ class Fold:
         # if recSeqMixed:
         #    return Fold.SEQ_STATE["MIXED"]
 
-        assert startingNode is not None
-        return startingNode.get_state()
+        assert starting_node is not None
+        return starting_node.get_state()

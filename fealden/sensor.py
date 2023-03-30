@@ -17,46 +17,46 @@ class Sensor:
 
     def __init__(
         self,
-        dataFile: tuple[str, list[dict[str, float | list[list[int]]]]],
-        recSeq: dict[str, int],
-        respSeq: dict[str, int],
-        desRecSeqState: int,
-        seedName: str,
-        baseSeq: str,
+        data_file: tuple[str, list[dict[str, float | list[list[int]]]]],
+        rec_seq: dict[str, int],
+        resp_seq: dict[str, int],
+        des_rec_seq_state: int,
+        seed_name: str,
+        base_seq: str,
     ):
         """
         This is the constructor for Sensor.
         Paramaters:
-                dataFile <- a File object (this should be the .ct
+                data_file <- a File object (this should be the .ct
                                             returned from a unafold query)
-                recSeq   <- a dict of the form {'start': n, 'end': p}, where n,p are
+                rec_seq   <- a dict of the form {'start': n, 'end': p}, where n,p are
                             integers and represent, respectivly, the starting and
                             ending locaiton of the recognition sequence within the
                             overall sensor's sequence.
-                respSeq <- a dict of the form {'start': n, 'end': p}, where n,p are
+                resp_seq <- a dict of the form {'start': n, 'end': p}, where n,p are
                             integers and represent, respectivly, the starting and
                             ending locaiton of the recognition response sequence
                             within the overall sensor's sequence. n and p are both -1
                             if the recognition sequence is single stranded.
-                desRecSeqState <- An integer, either 0 or 1, representing the state in
-                            which the recognition sequence binds to the target.
+                des_rec_seq_state <- An integer, either 0 or 1, representing the state
+                            in which the recognition sequence binds to the target.
                             0 represents double stranded, 1 represents single stranded.
-                seedName <- An integer, this is a simple tag to represent which
+                seed_name <- An integer, this is a simple tag to represent which
                             graph gave rise to this sensor.
         """
-        self.seedName = seedName
-        self.recSeq = recSeq
-        self.respSeq = respSeq
-        self.desRecSeqState = desRecSeqState
+        self.seed_name = seed_name
+        self.rec_seq = rec_seq
+        self.resp_seq = resp_seq
+        self.des_rec_seq_state = des_rec_seq_state
 
         # Data file is passed to interpret_data, actually list
-        (self.seq, self.folds) = self.interpret_data(dataFile)
-        self.onConc = 0
-        self.offConc = 0
-        self.noiseConc = 0
-        self.onToOffDist = 0
-        self.baseSeq = baseSeq
-        (self.tagLoc, self.score) = self.get_tag_and_score()
+        (self.seq, self.folds) = self.interpret_data(data_file)
+        self.on_conc = 0
+        self.off_conc = 0
+        self.noise_conc = 0
+        self.on_to_off_dist = 0
+        self.base_seq = base_seq
+        (self.tag_loc, self.score) = self.get_tag_and_score()
 
     def interpret_data(
         self, data: tuple[str, list[dict[str, float | list[list[int]]]]]
@@ -73,13 +73,13 @@ class Sensor:
             (seq, folds) <-- the tuple described above.
 
         """
-        seq, structureData = data[0], data[1]
+        seq, structure_data = data[0], data[1]
         # (seq, structureData) = self.simplify_input(lines)
         folds: list[fold.Fold] = []
 
-        for each in structureData:
+        for each in structure_data:
             this_fold = fold.Fold(
-                each["bps"], each["deltaG"], self.recSeq  # type: ignore
+                each["bps"], each["deltaG"], self.rec_seq  # type: ignore
             )
             folds.append(this_fold)
 
@@ -128,30 +128,30 @@ class Sensor:
         Returns:
             (sequence, stuructureData) -- the tuple described above
         """
-        structureData = []
-        foldIndex = -1
-        foldSize = int(lines[0].split()[0])
+        structure_data = []
+        fold_index = -1
+        fold_size = int(lines[0].split()[0])
         sequence = []
 
         for i, v in enumerate(lines):
-            if i % (foldSize + 1) == 0:
+            if i % (fold_size + 1) == 0:
                 # This line holds a deltaG value for a new structure
                 deltaG = float(v.split()[3])
-                structureData.append({"deltaG": deltaG, "bps": []})
-                foldIndex += 1
+                structure_data.append({"deltaG": deltaG, "bps": []})
+                fold_index += 1
             else:
                 # This line holds information about the structure we're
                 # currently working on
                 temp = v.split()
                 strlist = temp[0:1] + temp[4:5]
-                structureData[foldIndex]["bps"].append(  # type: ignore
+                structure_data[fold_index]["bps"].append(  # type: ignore
                     [int(x) for x in strlist]
                 )
                 # we've just appended the base pair number, and the number of the
                 # base pair it is bound to
-                if i < foldSize + 1:
+                if i < fold_size + 1:
                     sequence.append(temp[1])
-        return ("".join(sequence).lower(), structureData)  # type: ignore
+        return ("".join(sequence).lower(), structure_data)  # type: ignore
 
     def get_tag_and_score(self) -> tuple[int, float]:
         """
@@ -181,13 +181,13 @@ class Sensor:
             and self.folds[2].deltaG - DELTA_G_MAX_DIFFERENCE > self.folds[1].deltaG
         ):
             # "Delta Gs of 2nd and 3rd folds are disparate."
-            if self.folds[0].recSeqState == self.folds[1].recSeqState:
+            if self.folds[0].rec_seq_state == self.folds[1].rec_seq_state:
                 # "Recognition sequence is in the same state in the first
                 # two folds."
                 return (0, -3)
             if (
-                self.folds[0].recSeqState != self.desRecSeqState
-                and self.folds[1].recSeqState != self.desRecSeqState
+                self.folds[0].rec_seq_state != self.des_rec_seq_state
+                and self.folds[1].rec_seq_state != self.des_rec_seq_state
             ):
                 # "In neither of the first two folds is the recognition
                 # sequence in the desired state."
@@ -197,22 +197,22 @@ class Sensor:
             return (0, -5)
         # sensor has passed triage criteria
         # compute validity based on criteria requiring distance
-        scoreData = self.get_tagging_information()
+        score_data = self.get_tagging_information()
 
-        if scoreData == 0:
+        if score_data == 0:
             return (0, -6)
         (
-            self.tagLoc,
-            self.onConc,
-            self.offConc,
-            self.noiseConc,
-            self.wrongConc,
-            self.fuzzyConc,
-            self.onToOffDist,
-        ) = scoreData  # type: ignore
+            self.tag_loc,
+            self.on_conc,
+            self.off_conc,
+            self.noise_conc,
+            self.wrong_conc,
+            self.fuzzy_conc,
+            self.on_to_off_dist,
+        ) = score_data  # type: ignore
         # if sensor is valid, get optimal tagging scenario
         # score sensor based on optimal tagging scenario
-        return (self.tagLoc, self.calculate_score())
+        return (self.tag_loc, self.calculate_score())
 
     def calculate_score(self) -> float:
         """Calculate a score for the sensor based on optimal desired scenario.
@@ -222,86 +222,86 @@ class Sensor:
         """
 
         return (
-            1 - abs(self.onConc - self.offConc) / (self.onConc + self.offConc)
-        ) * self.onToOffDist
+            1 - abs(self.on_conc - self.off_conc) / (self.on_conc + self.off_conc)
+        ) * self.on_to_off_dist
 
     def get_onstate_and_wrong(
         self, MAX_ON_DIST: int, distances: list[int]
     ) -> tuple[list[tuple[int, float]], float]:
         """Helper for finding tagging information, finding onState and concWrong."""
-        onStateInfo = []
-        concWrong: float = 0.0
+        on_state_info = []
+        conc_wrong: float = 0.0
         for i, d in enumerate(distances):
             # the fold to which this distance is refering
-            currFold = self.folds[i]
+            curr_fold = self.folds[i]
             # distance is less than or equal to on dist (ie this is a on
             # fold)
             if MAX_ON_DIST - d >= 0:
-                if self.desRecSeqState == currFold.recSeqState:
+                if self.des_rec_seq_state == curr_fold.rec_seq_state:
                     # This is a on position and the sensor will bind the
                     # target
-                    onStateInfo.append((d, currFold.conc))
+                    on_state_info.append((d, curr_fold.conc))
                 else:  # this is sending the opposite of the desired signal
-                    concWrong += currFold.conc
+                    conc_wrong += curr_fold.conc
                     # this is only to speed it up when we don't want any
                     # noise
                     break
 
-        return onStateInfo, concWrong
+        return on_state_info, conc_wrong
 
     def get_offstate_wrong_and_fuzzy(
         self,
         MAX_ON_DIST: int,
         MIN_OFF_CHANGE: int,
         distances: list[int],
-        weightedAvgOnDist: float,
+        weighted_avg_on_dist: float,
     ) -> tuple[list[tuple[int, float]], float, float]:
         """Helper for finding tagging information, finding offState,
         concFuzzy and concWrong."""
-        offStateInfo = []
-        concWrong = 0.0
-        concFuzzy = 0.0
+        off_state_info = []
+        conc_wrong = 0.0
+        conc_fuzzy = 0.0
         for i, d in enumerate(distances):
-            currFold = self.folds[i]
+            curr_fold = self.folds[i]
             if MAX_ON_DIST - d >= 0:
                 continue  # we've already delt with these folds
-            elif MIN_OFF_CHANGE <= d - weightedAvgOnDist:
-                if self.desRecSeqState != currFold.recSeqState:
+            elif MIN_OFF_CHANGE <= d - weighted_avg_on_dist:
+                if self.des_rec_seq_state != curr_fold.rec_seq_state:
                     # This is a off position and the sensor will not bind
                     # the target
-                    offStateInfo.append((d, currFold.conc))
+                    off_state_info.append((d, curr_fold.conc))
                 else:  # this is sending the wrong signal
-                    concWrong += currFold.conc
+                    conc_wrong += curr_fold.conc
                     # this is only to speed it up when we don't want any
                     # noise
                     break
             # the tag distance is not close enough nor far enough to be off
             else:
-                concFuzzy += currFold.conc
+                conc_fuzzy += curr_fold.conc
                 # this is only to speed it up when we don't want any noise
                 break
-        return offStateInfo, concWrong, concFuzzy
+        return off_state_info, conc_wrong, conc_fuzzy
 
     def get_tag_locations(
         self, MAX_ON_DIST: int, MIN_OFF_CHANGE: int
     ) -> list[tuple[int, list[int]]]:
-        tagLocs = []
+        tag_locs = []
         # get potential tagging locations and their distances in all the
         # various folds
         for i, v in enumerate(self.seq):
             if (
                 v.lower() == "t"
-                and (i + 1 < self.recSeq["start"] or i + 1 > self.recSeq["end"])
-                and (i + 1 < self.respSeq["start"] or i + 1 > self.respSeq["end"])
+                and (i + 1 < self.rec_seq["start"] or i + 1 > self.rec_seq["end"])
+                and (i + 1 < self.resp_seq["start"] or i + 1 > self.resp_seq["end"])
             ):
                 distances = [f.get_distance(1, i + 1) for f in self.folds]
-                smallestDist = min(distances)
+                smallest_dist = min(distances)
                 if (
-                    smallestDist <= MAX_ON_DIST
-                    and max(distances) - smallestDist >= MIN_OFF_CHANGE
+                    smallest_dist <= MAX_ON_DIST
+                    and max(distances) - smallest_dist >= MIN_OFF_CHANGE
                 ):
-                    tagLocs.append((i + 1, distances))
-        return tagLocs
+                    tag_locs.append((i + 1, distances))
+        return tag_locs
 
     def get_tagging_information(
         self,
@@ -337,76 +337,79 @@ class Sensor:
         """
         MAX_ON_DIST = 12
         MIN_OFF_CHANGE = 10
-        tagLocs = self.get_tag_locations(MAX_ON_DIST, MIN_OFF_CHANGE)
+        tag_locs = self.get_tag_locations(MAX_ON_DIST, MIN_OFF_CHANGE)
 
-        maxAvgDeltaOnToOff = 0
+        max_avg_delta_on_to_off = 0
         # determine if this would make a good sensor if tagged in each possible
         # location
-        for t in tagLocs:
-            onConc = 0.0
-            offConc = 0.0
-            noiseConc = 0.0
-            concWrong = 0.0
-            concFuzzy = 0.0
+        for t in tag_locs:
+            on_conc = 0.0
+            off_conc = 0.0
+            noise_conc = 0.0
+            conc_wrong = 0.0
+            conc_fuzzy = 0.0
 
             # position == the loation of the tag
             # distances == the physical distance between the tag
             #             and the first position in each fold
             (position, distances) = t
 
-            onStateInfo, new_concWrong = self.get_onstate_and_wrong(
+            on_state_info, new_conc_wrong = self.get_onstate_and_wrong(
                 MAX_ON_DIST, distances
             )
-            concWrong += new_concWrong
+            conc_wrong += new_conc_wrong
 
-            if onStateInfo == []:  # no on states
+            if on_state_info == []:  # no on states
                 continue
 
             # total concentration of all the on states
-            onConc = sum([j for (i, j) in onStateInfo])
+            on_conc = sum([j for (i, j) in on_state_info])
 
-            weightedAvgOnDist = sum([i * (j / onConc) for (i, j) in onStateInfo])
+            weighted_avg_on_dist = sum([i * (j / on_conc) for (i, j) in on_state_info])
 
             (
-                offStateInfo,
+                off_state_info,
                 more_concWrong,
                 new_concFuzzy,
             ) = self.get_offstate_wrong_and_fuzzy(
-                MAX_ON_DIST, MIN_OFF_CHANGE, distances, weightedAvgOnDist
+                MAX_ON_DIST, MIN_OFF_CHANGE, distances, weighted_avg_on_dist
             )
-            concWrong += more_concWrong
-            concFuzzy += new_concFuzzy
+            conc_wrong += more_concWrong
+            conc_fuzzy += new_concFuzzy
 
-            noiseConc = concFuzzy + concWrong
+            noise_conc = conc_fuzzy + conc_wrong
 
-            if offStateInfo == []:  # no off states
+            if off_state_info == []:  # no off states
                 continue
 
             # the concentration of all the off states
-            offConc = sum([j for (i, j) in offStateInfo])
+            off_conc = sum([j for (i, j) in off_state_info])
 
             # if noiseConc*10 > offConc + onConc or\
             #    concWrong*10 > offConc or\
             #    concWrong*10 > onConc or\
 
-            if noiseConc > 0 or offConc * 10 < onConc or onConc * 10 < offConc:
+            if noise_conc > 0 or off_conc * 10 < on_conc or on_conc * 10 < off_conc:
                 # "too much noise, too many are wrong, or ratios are off"
                 continue
             #
-            weightedAvgOnToOffDist = sum(
-                [(i - weightedAvgOnDist) * (j / offConc) for (i, j) in offStateInfo]
+            weighted_avg_on_to_off_dist = sum(
+                [
+                    (i - weighted_avg_on_dist) * (j / off_conc)
+                    for (i, j) in off_state_info
+                ]
             )
 
             # CHANGE to check for best overall score
-            if maxAvgDeltaOnToOff < weightedAvgOnToOffDist:
+            if max_avg_delta_on_to_off < weighted_avg_on_to_off_dist:
                 return (
                     position,
-                    onConc,
-                    offConc,
-                    noiseConc,
-                    concWrong,
-                    concFuzzy,
-                    weightedAvgOnToOffDist,
+                    on_conc,
+                    off_conc,
+                    noise_conc,
+                    conc_wrong,
+                    conc_fuzzy,
+                    weighted_avg_on_to_off_dist,
                 )
 
         return 0
@@ -456,18 +459,18 @@ class Sensor:
             [
                 self.seq,
                 str(self.score),
-                str(self.seedName),
-                str(self.tagLoc),
-                str(self.onConc),
-                str(self.offConc),
-                str(self.offConc / self.onConc),
-                str(self.noiseConc),
-                str(self.wrongConc),
-                str(self.fuzzyConc),
-                str(self.onToOffDist),
+                str(self.seed_name),
+                str(self.tag_loc),
+                str(self.on_conc),
+                str(self.off_conc),
+                str(self.off_conc / self.on_conc),
+                str(self.noise_conc),
+                str(self.wrong_conc),
+                str(self.fuzzy_conc),
+                str(self.on_to_off_dist),
                 str(len(self.seq)),
                 str(len(self.folds)),
-                self.baseSeq,
+                self.base_seq,
             ]
         )
 

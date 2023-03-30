@@ -161,7 +161,7 @@ def __main__() -> None:
 
 
 def generate_sensor(
-    seed: seed.Seed, recSeq: str, numPossSen: int, core: int
+    seed: seed.Seed, rec_seq: str, num_poss_sen: int, core: int
 ) -> list[sensor.Sensor]:
     """
     generate_sensor() gens a # of possible sensors and returns a list of valid sensors.
@@ -183,9 +183,9 @@ def generate_sensor(
     version = 0
     minScore = 0
 
-    while version < numPossSen:
+    while version < num_poss_sen:
         version += 1
-        sen = seed.build_sensor(core, version, recSeq)
+        sen = seed.build_sensor(core, version, rec_seq)
 
         # only keep good sensors
         if sen is None:
@@ -227,43 +227,43 @@ class Fealden:
 
     def __init__(
         self,
-        recSeq: str,
-        bindingState: int,
-        maxSensorSize: int,
-        minSensPerSeed: int,
+        rec_seq: str,
+        binding_state: int,
+        max_sensor_size: int,
+        min_sens_per_seed: int,
         interactive: bool,
-        outputfile: str,
+        output_file: str,
     ) -> None:
         """Initialize new Fealden instance."""
-        self.recSeq = recSeq
-        self.bindingState = bindingState
-        self.maxSensorSize = maxSensorSize
-        self.outputfile = outputfile
+        self.rec_seq = rec_seq
+        self.binding_state = binding_state
+        self.max_sensor_size = max_sensor_size
+        self.output_file = output_file
 
         # Pulled seed file constructs into program to reduce file reads and
         # remove file dependencies
-        seeds = self.parse_seed_file(SEED_GRAPHS[int(bindingState)])
+        seeds = self.parse_seed_file(SEED_GRAPHS[int(binding_state)])
 
         # recommendedSensPerSeed = 10 * len(recSeq) *\
         #     ((50 - maxSensorSize) if (maxSensorSize < 40) else (10))
-        posSensPerSeed = minSensPerSeed
+        poss_sens_per_seed = min_sens_per_seed
 
         # FIXME: Implement recommendedSensPerSeed
         # recommendedSensPerSeed if \
         # recommendedSensPerSeed < minSensPerSeed else minSensPerSeed
 
-        timeZero = timeit.default_timer()
-        numProcess = multiprocessing.cpu_count()
-        pool = multiprocessing.Pool(numProcess)
-        seedSensPerProcess = posSensPerSeed / numProcess
+        time_zero = timeit.default_timer()
+        num_process = multiprocessing.cpu_count()
+        pool = multiprocessing.Pool(num_process)
+        seed_sens_per_process = poss_sens_per_seed / num_process
 
         tasks = []
         sensors: dict[str, sensor.Sensor] = {}
 
         i = 0
-        while i < numProcess:
+        while i < num_process:
             i += 1
-            tasks.extend([(s, self.recSeq, seedSensPerProcess, i) for s in seeds])
+            tasks.extend([(s, self.rec_seq, seed_sens_per_process, i) for s in seeds])
 
         for t in tasks:
             pool.apply_async(
@@ -280,19 +280,19 @@ class Fealden:
 
         if not interactive:
             try:
-                f = open(self.outputfile, "w")
+                f = open(self.output_file, "w")
             except OSError:
-                print("Unable to open " + self.outputfile)
-                self.outputfile = "recent-results.csv"
-                f = open(self.outputfile, "w")
+                print("Unable to open " + self.output_file)
+                self.output_file = "recent-results.csv"
+                f = open(self.output_file, "w")
 
             f.write(sensor.Sensor.csv_header() + "\n")
             for sen in s:
                 f.write(str(sen) + "\n")
             f.close()
 
-            print("Stored " + str(len(s)) + " result(s) in " + self.outputfile)
-            print("Took " + str(timeit.default_timer() - timeZero) + " seconds")
+            print("Stored " + str(len(s)) + " result(s) in " + self.output_file)
+            print("Took " + str(timeit.default_timer() - time_zero) + " seconds")
         else:
             output_list = []
             output_list.append(sensor.Sensor.csv_header())
@@ -340,29 +340,29 @@ class Fealden:
         seeds = []
         i = 0
         li = lines[i]
-        seedNum = 0
+        seed_num = 0
         while i < (len(lines)):
             i += 1
             li = lines[i]
-            graphData = []
-            recNodeName = "-1"
-            seedNum += 1
+            graph_data = []
+            rec_node_name = "-1"
+            seed_num += 1
             while i < (len(lines)) and lines[i].split()[0] != "Seed":
                 li = lines[i].strip()
                 if len(li) == 1:
-                    recNodeName = li
+                    rec_node_name = li
                     i += 1
                     continue
-                graphData.append(li)
+                graph_data.append(li)
                 i += 1
             seeds.append(
                 seed.Seed(
-                    graphData,
-                    recNodeName,
-                    self.recSeq,
-                    self.bindingState,
-                    str("Graph " + str(seedNum)),
-                    self.maxSensorSize,
+                    graph_data,
+                    rec_node_name,
+                    self.rec_seq,
+                    self.binding_state,
+                    str("Graph " + str(seed_num)),
+                    self.max_sensor_size,
                 )
             )
         return seeds
