@@ -221,9 +221,20 @@ class Sensor:
         as well as minimize difference in calculated concentration of ON and OFF state.
         """
 
+        # Improved scoring function:
+        # First term ranges from 0.5 (good) to 1 (bad), with good being Ks near 1
+        # abs(2A-B) / (A+B) when A == B is 0.5, when B >> A tends to 1
+        #
+        # Second term, for current distance algorithm, tends 0.5 (good) to 1 (bad),
+        # with larger distance favored; observed distances range from 10 to ~50
+        # 1/10 (bad) = 0.1, 1/50 (good) = 0.05
+        # Multiplied by 10 for rough parity in weighting, this could be adjusted
+
+        SIGNAL_GAIN_WEIGHT = 10
+
         return (
-            1 - abs(self.on_conc - self.off_conc) / (self.on_conc + self.off_conc)
-        ) * self.on_to_off_dist
+            abs(2 * self.on_conc - self.off_conc) / (self.on_conc + self.off_conc)
+        ) + (SIGNAL_GAIN_WEIGHT * (1 / self.on_to_off_dist))
 
     def get_onstate_and_wrong(
         self, MAX_ON_DIST: int, distances: list[int]
