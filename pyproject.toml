@@ -21,7 +21,7 @@ dependencies = [
         "mfold3.6 @ http://www.unafold.org/mfold/software/download-mfold.php"
 ]
 keywords = ["biosensor", "aptamer", "DNA"]
-version = "0.3.0"
+version = "0.3.1"
 
 [project.urls]
 Homepage = "https://github.com/Paradoxdruid/fealden"

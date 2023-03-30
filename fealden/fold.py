@@ -62,7 +62,6 @@ class Fold:
                 self.ptrList[i + currentIndex] = currentNode
                 length = i + 1  # keep track in case this is the last node
             else:
-                # print i
                 isLastNode = False
                 currentNode.set_length(i)
                 nextNode: node.DSNode | node.SSNode | None = None
@@ -243,8 +242,7 @@ class Fold:
         #     if p != startingNode:
         #         recSeqMixed = True
         # if recSeqMixed:
-        # print "Rec seq mixed"
         #    return Fold.SEQ_STATE["MIXED"]
-        # print "Rec seq " + str(startingNode.get_state())
+
         assert startingNode is not None
         return startingNode.get_state()

@@ -77,17 +77,11 @@ class Sensor:
         # (seq, structureData) = self.simplify_input(lines)
         folds: list[fold.Fold] = []
 
-        # for v in structureData:
-        #     fold = f.Fold(v['bps'], v['deltaG'], self.recSeq)
-        #     folds.append(fold)
         for each in structureData:
-            # print(i,v)
-            # print(f'fold inputs: {v[str(bps)]}, {v[str(deltaG)]}, {self.recSeq}')
             this_fold = fold.Fold(
                 each["bps"], each["deltaG"], self.recSeq  # type: ignore
             )
             folds.append(this_fold)
-            # blah = [i.foldData for i in folds]
 
         return (seq, folds)
 

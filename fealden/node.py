@@ -156,10 +156,7 @@ class DSNode(Node):
         return 0  # DS
 
     def get_rec_seq_data(self) -> list[dict[str, int]]:
-        # print 'getting data, node size is ' + str(self.length)
-        # print 'node is ' + str(self)
         recSeqSize = self.length - (self.relLocRecStart - 1 + self.relLocRecEnd - 1)
-        # print "DS rec seq size is " + str(recSeqSize)
         return [
             {"start": self.recSeqStart, "end": self.recSeqStart + recSeqSize},
             {"start": self.recRespStart, "end": self.recRespStart + recSeqSize},
@@ -382,7 +379,6 @@ class SSNode(Node):
 
     def get_rec_seq_data(self) -> list[dict[str, int]]:
         recSeqSize = self.length - (self.relLocRecStart - 1 + self.relLocRecEnd - 1)
-        # print "SS rec seq size is " + str(recSeqSize)
         return [
             {"start": self.recSeqStart, "end": self.recSeqStart + recSeqSize},
             {"start": -1, "end": -1},
