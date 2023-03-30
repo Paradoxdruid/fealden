@@ -36,6 +36,11 @@ class Fold:
         self.recSeq = recSeq
         self.recSeqState: int = self.get_rec_seq_state()
 
+    def __repr__(self) -> str:
+        return f"Fold: head={repr(self.head)}, deltaG={self.deltaG}, conc={self.conc},\
+ foldData={self.foldData}, ptrList={self.ptrList}, recSeq={self.recSeq},\
+ recSeqState={self.recSeqState}"
+
     def construct_graph_SSNode(
         self, currentNode: node.SSNode, currentIndex: int
     ) -> None:
