@@ -226,8 +226,8 @@ class Sensor:
         # abs(2A-B) / (A+B) when A == B is 0.5, when B >> A tends to 1
         #
         # Second term, for current distance algorithm, tends 0.5 (good) to 1 (bad),
-        # with larger distance favored; observed distances range from 10 to ~50
-        # 1/10 (bad) = 0.1, 1/50 (good) = 0.05
+        # with larger distance favored; observed distances range from 10 to ~ 25
+        # 1/10 (bad) = 0.1, 1/50 (good) = 0.04
         # Multiplied by 10 for rough parity in weighting, this could be adjusted
 
         SIGNAL_GAIN_WEIGHT = 10
