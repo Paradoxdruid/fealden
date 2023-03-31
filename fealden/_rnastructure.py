@@ -42,7 +42,7 @@ class RNAfolder:
             for i in range(self.number_folds)
         ]
         self.structure_dict: list[dict[str, float | list[list[int]]]] = [
-            dict() for _ in range(self.number_folds)
+            {} for _ in range(self.number_folds)
         ]
         self.make_fold_dict()
 
@@ -66,14 +66,13 @@ class RNAfolder:
         self, h: int = 10, w: int = 10, structure_num: int = 1
     ) -> list[list[int]]:
         self.RNAobj.DetermineDrawingCoordinates(h, w, structure_num)
-        comp = [
+        return [
             [
                 self.RNAobj.GetNucleotideXCoordinate(i),
                 self.RNAobj.GetNucleotideYCoordinate(i),
             ]
             for i in range(1, len(self.RNAobj) + 1)
         ]
-        return comp
 
     def dist_from_index(
         self, index1: int, index2: int, structure_num: int = 1
@@ -114,7 +113,7 @@ class RNAfolder:
         ]
         # tail = range(len(self)-segment, len(self))
         tag_list: list[dict[str, tuple[int, int, float]]] = [
-            dict() for _ in range(self.number_folds)
+            {} for _ in range(self.number_folds)
         ]
         prod = [[o, p] for o, p in itertools.product([1], tail[-segment:])]
         for i, a_dict in enumerate(tag_list):

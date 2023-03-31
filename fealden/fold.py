@@ -215,7 +215,7 @@ class Fold:
             if each in traversed:
                 continue
             temp_dist = current.get_distance(previous, each) + self.get_dist_to_index(
-                index, [j for j in traversed], current, each
+                index, traversed, current, each
             )
             if temp_dist < dist:
                 dist = temp_dist

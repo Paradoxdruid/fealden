@@ -33,7 +33,7 @@ class RNAfolder:
             for i in range(self.number_folds)
         ]
         self.structure_dict: list[dict[str, float | list[list[int]]]] = [
-            dict() for _ in range(self.number_folds)
+            {} for _ in range(self.number_folds)
         ]
         self.make_fold_dict()
 
@@ -88,9 +88,7 @@ class RNAfolder:
     def return_basepair(position: int, ct_lines: list[str]) -> int:
         my_line = ct_lines[position - 1]
 
-        pair_number = int(my_line.split()[4])
-
-        return pair_number
+        return int(my_line.split()[4])
 
     @staticmethod
     def return_free_energy(header_line: str) -> float:
@@ -138,9 +136,7 @@ class RNAfolder:
 
         m = pattern.findall(contents)
 
-        list_form = [[int(float(i[0]) / 10), int(float(i[1]) / 10)] for i in m]
-
-        return list_form
+        return [[int(float(i[0]) / 10), int(float(i[1]) / 10)] for i in m]
 
     def dist_from_index(
         self, index1: int, index2: int, structure_num: int = 1
@@ -175,7 +171,7 @@ class RNAfolder:
         tail = [i for i, j in enumerate(self.seq) if j == "T"]
         # tail = range(len(self)-segment, len(self))
         tag_list: list[dict[str, tuple[int, int, float]]] = [
-            dict() for _ in range(self.number_folds)
+            {} for _ in range(self.number_folds)
         ]
         prod = [[o, p] for o, p in itertools.product([1], tail[-segment:])]
         for i, a_dict in enumerate(tag_list):

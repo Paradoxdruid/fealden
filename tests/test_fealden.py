@@ -58,9 +58,9 @@ def test_generate_sensor() -> None:
 
 
 @mock.patch("fealden.fealden.Fealden")
-@mock.patch(
-    "argparse.ArgumentParser.parse_args",
-    return_value=argparse.Namespace(
+@mock.patch("argparse.ArgumentParser.parse_args")
+def test__main__(mock_arg: mock.Mock, mock_fealden: mock.Mock) -> None:
+    mock_arg.return_value = argparse.Namespace(
         recSeq="CACGTG",
         bindingState=1,
         ms=50,
@@ -68,8 +68,6 @@ def test_generate_sensor() -> None:
         interactive=None,
         out="test.csv",
         v=None,
-    ),
-)
-def test__main__(_: mock.Mock, mock_fealden: mock.Mock) -> None:
+    )
     __main__()
     mock_fealden.assert_called_once_with("cacgtg", 1, 50, 500, None, "test.csv")

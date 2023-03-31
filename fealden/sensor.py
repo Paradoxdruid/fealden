@@ -276,7 +276,7 @@ class Sensor:
             curr_fold = self.folds[i]
             if MAX_ON_DIST - d >= 0:
                 continue  # we've already delt with these folds
-            elif MIN_OFF_CHANGE <= d - weighted_avg_on_dist:
+            if MIN_OFF_CHANGE <= d - weighted_avg_on_dist:
                 if self.des_rec_seq_state != curr_fold.rec_seq_state:
                     # This is a off position and the sensor will not bind
                     # the target

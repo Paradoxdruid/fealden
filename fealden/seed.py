@@ -217,7 +217,7 @@ class Seed:
         # Create an RNSAstructure object
         RNA_obj = structure.RNAfolder(seq)  # type:ignore
         sen_in = seq.lower(), RNA_obj.structure_dict
-        sen = sensor.Sensor(
+        return sensor.Sensor(
             sen_in,
             leading_rec_dat,
             lagging_rec_dat,
@@ -225,8 +225,6 @@ class Seed:
             self.name,
             base_seq,
         )
-
-        return sen
 
     def generate_node_sizes(self) -> None:
         """
@@ -279,9 +277,7 @@ class Seed:
                     real_nodes[n] = (current, length)
                     size -= length
 
-        keys = [
-            n for n in real_nodes
-        ]  # a list of the 'key' names in the realNodes dict
+        keys = list(real_nodes)  # a list of the 'key' names in the realNodes dict
         while size > 0:
             # increasing the size of random nodes until size limit is reached
             key = random.choice(keys)
