@@ -58,3 +58,7 @@ files = "fealden/*.py"
 
 [tool.isort]
 profile = "black"
+
+[tool.ruff]
+select = ["E", "F", "B", "W", "I", "C4", "PIE", "PYI"]
+ignore = ["B905"]
