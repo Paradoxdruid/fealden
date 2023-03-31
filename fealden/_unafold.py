@@ -63,11 +63,10 @@ class RNAfolder:
                 cwd=tmpdirname,
             )
 
-            hybrid_output = hybrid_process.communicate(input=f"{sequence}")[0]
+            _ = hybrid_process.communicate(input=f"{sequence}")[0]
 
-            # Uncomment if your hybrid-ss-min does not output to stdout
-            # with open(f"{tmpdirname}/stdin.ct") as f:
-            #     hybrid_output = f.read()
+            with open(f"{tmpdirname}/stdin.ct") as f:
+                hybrid_output = f.read()
 
         return hybrid_output
 
@@ -94,8 +93,7 @@ class RNAfolder:
             lines = heading_and_lines[1:]
             lines_list.append(lines)
 
-        # Change both to [0:] if using file-base hybrid-ss-min
-        return (headings[1:], lines_list[1:])
+        return (headings[0:], lines_list[0:])
 
     @staticmethod
     def return_basepair(position: int, ct_lines: list[str]) -> int:
