@@ -45,12 +45,25 @@ class RNAfolder:
 
         with tempfile.TemporaryDirectory() as tmpdirname:
             hybrid_ss_min_location = os.getenv("HYBRID_SS_MIN")
-            command = f'printf "{sequence}" | {hybrid_ss_min_location} \
-                --mfold=15 --sodium=0.15 --magnesium=0.0005 --NA=DNA /dev/stdin'
 
-            hybrid_output = subprocess.run(
-                command, shell=True, capture_output=True, cwd=tmpdirname, text=True
-            ).stdout
+            command = [
+                f"{hybrid_ss_min_location}",
+                "--mfold=15",
+                "--sodium=0.15",
+                "--magnesium=0.0005",
+                "--NA=DNA",
+                "/dev/stdin",
+            ]
+            hybrid_process = subprocess.Popen(
+                command,
+                text=True,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=tmpdirname,
+            )
+
+            hybrid_output = hybrid_process.communicate(input=f"{sequence}")[0]
 
             # Uncomment if your hybrid-ss-min does not output to stdout
             # with open(f"{tmpdirname}/stdin.ct") as f:
@@ -120,10 +133,24 @@ class RNAfolder:
 
         def call_sir_graph(tmpdirname: str, ct_output: str) -> None:
             sir_graph_location = os.getenv("SIR_GRAPH")
-            long_command = f'printf "{ct_output}" | \
-                {sir_graph_location} -p -o {tmpdirname}/new.ps /dev/stdin'
+            command = [
+                f"{sir_graph_location}",
+                "-p",
+                "-o",
+                f"{tmpdirname}/new.ps",
+                "/dev/stdin",
+            ]
 
-            _ = subprocess.run(long_command, shell=True, capture_output=True, text=True)
+            sir_graph_process = subprocess.Popen(
+                command,
+                text=True,
+                stdin=subprocess.PIPE,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                cwd=tmpdirname,
+            )
+
+            _ = sir_graph_process.communicate(input=f"{ct_output}")
 
         with tempfile.TemporaryDirectory() as tmpdirname:
             call_sir_graph(tmpdirname, sir_graph_input)
