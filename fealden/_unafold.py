@@ -4,7 +4,7 @@ import os
 import re
 import subprocess
 import tempfile
-from typing import Iterator
+from collections.abc import Iterator
 
 
 class RNAfolder:

@@ -107,7 +107,9 @@ class RNAfolder:
         tags_for_structure = []
         tail = [
             i
-            for i, j in zip(self.RNAobj.iterIndices(), self.RNAobj.iterNucs())
+            for i, j in zip(
+                self.RNAobj.iterIndices(), self.RNAobj.iterNucs(), strict=True
+            )
             if j == "T"
         ]
         # tail = range(len(self)-segment, len(self))
