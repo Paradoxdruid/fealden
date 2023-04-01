@@ -1,6 +1,6 @@
 # fealden
 
-![gpl3.0](https://img.shields.io/github/license/Paradoxdruid/academia-admin-automation.svg "Licensed under GPL 3.0")  [![CodeFactor](https://www.codefactor.io/repository/github/paradoxdruid/fealden/badge)](https://www.codefactor.io/repository/github/paradoxdruid/fealden)  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/520de6c0a1aa463b8b12f4ddc746b4d3)](https://www.codacy.com/gh/Paradoxdruid/fealden/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Paradoxdruid/fealden&amp;utm_campaign=Badge_Grade) [![CodeQL](https://github.com/Paradoxdruid/fealden/actions/workflows/codeql.yml/badge.svg)](https://github.com/Paradoxdruid/fealden/actions/workflows/codeql.yml) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black) [![mypy](https://img.shields.io/badge/%20type_checker-mypy-%231674b1?style=flat)](https://github.com/python/mypy)
+![gpl3.0](https://img.shields.io/github/license/Paradoxdruid/academia-admin-automation.svg?color=success "Licensed under GPL 3.0")  [![CodeFactor](https://www.codefactor.io/repository/github/paradoxdruid/fealden/badge)](https://www.codefactor.io/repository/github/paradoxdruid/fealden)  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/520de6c0a1aa463b8b12f4ddc746b4d3)](https://www.codacy.com/gh/Paradoxdruid/fealden/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Paradoxdruid/fealden&amp;utm_campaign=Badge_Grade) [![CodeQL](https://github.com/Paradoxdruid/fealden/actions/workflows/codeql.yml/badge.svg)](https://github.com/Paradoxdruid/fealden/actions/workflows/codeql.yml) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black) [![mypy](https://img.shields.io/badge/%20type_checker-mypy-%231674b1?style=flat)](https://github.com/python/mypy)
 
 ## Introduction
 
@@ -68,9 +68,9 @@ RNASTRUCTURE=/home/username/RNAstructure
 ## Usage
 
 To use **Fealden**:
-`fealden "TATATAA" 1`
+`python -m fealden.fealden "TATATAA" 1`
 
-(Where `"TATATAA"` is the input binding/recognition element (such as an aptamer), and `1` indicates whether the binding element is predominantly single-stranded (0) or double-stranded (1) in the binding-active state.)
+(Where `"TATATAA"` is the input binding/recognition element (such as an aptamer), and `1` indicates whether the binding element is predominantly double-stranded (0) or single-stranded (1) in the binding-active state.)
 
 **Fealden** generates a .csv file of optimized biosensor sequences along with scoring metrics.
 
