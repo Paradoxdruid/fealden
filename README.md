@@ -68,7 +68,7 @@ RNASTRUCTURE=/home/username/RNAstructure
 ## Usage
 
 To use **Fealden**:
-`python -m fealden.fealden "TATATAA" 1`
+`python -m fealden "TATATAA" 1`
 
 (Where `"TATATAA"` is the input binding/recognition element (such as an aptamer), and `1` indicates whether the binding element is predominantly double-stranded (0) or single-stranded (1) in the binding-active state.)
 

@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest import mock
 
-from fealden.fealden import Fealden, __main__, generate_sensor
+from fealden.fealden import Fealden, generate_sensor, main
 from fealden.seed import Seed
 
 
@@ -69,5 +69,5 @@ def test__main__(mock_arg: mock.Mock, mock_fealden: mock.Mock) -> None:
         out="test.csv",
         v=None,
     )
-    __main__()
+    main()
     mock_fealden.assert_called_once_with("cacgtg", 1, 50, 500, None, "test.csv")

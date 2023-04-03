@@ -8,8 +8,6 @@ import timeit
 
 from . import seed, sensor
 
-# __all__ = ["Fealden", "Fold", "Node", "Seed", "Sensor", "Structure"]
-
 BINDING_STATE = {"DS": 0, "SS": 1}
 verbose = False
 
@@ -63,7 +61,7 @@ SEED_GRAPHS = {
 }
 
 
-def __main__() -> None:
+def main() -> None:
     """
     __main__() begins the program, parses, and validates the command line arguments.
 
@@ -368,6 +366,6 @@ class Fealden:
         return seeds
 
 
-# run the program from the command line
+# run the program from the command line; preserved here for compatibility
 if __name__ == "__main__":
-    __main__()
+    main()
