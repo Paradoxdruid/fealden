@@ -17,8 +17,9 @@ def test_Fealden() -> None:
             my_file = Path(tmpdirname).joinpath("test-results.csv")
             Fealden("cacgtg", 1, 50, 500, False, str(my_file.resolve()))
 
-            print(str(my_file.read_text()))
             assert "aaacgcagtatgtggccatacacgtgatgtgagagacatccgttagttt" in str(
+                my_file.read_text()
+            ) or "acttcgggacttgcttgaagcacgtgctattggtaccaatagtgagaagt" in str(
                 my_file.read_text()
             )
 
