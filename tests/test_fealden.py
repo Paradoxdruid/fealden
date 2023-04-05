@@ -27,9 +27,11 @@ def test_generate_sensor() -> None:
         mock_random.randint = random.Random(0).randint
         mock_random.choice = random.Random(0).choice
 
-        EXPECTED_SENSOR = "acttcgggacttgcttgaagcacgtgctattggtaccaatagtgagaagt,\
-7.53568650515562,Graph 2,16,673.9453257075509,1114.7313270339453,\
-1.6540382201829638,0.0,0.0,0.0,10.0,50,2,CACGTG"
+        EXPECTED_SENSOR = (
+            "acttcgggacttgcttgaagcacgtgctattggtaccaatagtgagaagt,"
+            "1.130352975773343,Graph 2,16,673.9453257075509,1114.7313270339453,"
+            "1.6540382201829638,0.0,0.0,0.0,10.0,50,2,CACGTG"
+        )
 
         actual = generate_sensor(
             Seed(
@@ -53,7 +55,6 @@ def test_generate_sensor() -> None:
             500,
             1,
         )
-
         assert repr(actual[0]) == EXPECTED_SENSOR
 
 

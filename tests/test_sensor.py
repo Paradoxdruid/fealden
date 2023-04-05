@@ -2,9 +2,11 @@ from fealden.sensor import Sensor
 
 
 def test_Sensor() -> None:
-    EXPECTED_SENSOR = "acttcgggacttgcttgaagcacgtgctattggtaccaatagtgagaagt,\
-7.53568650515562,2,16,673.9453257075509,1114.7313270339453,1.6540382201829638,\
-0.0,0.0,0.0,10.0,50,2,CACGTG"
+    EXPECTED_SENSOR = (
+        "acttcgggacttgcttgaagcacgtgctattggtaccaatagtgagaagt,1.130352975773343,"
+        "2,16,673.9453257075509,1114.7313270339453,1.6540382201829638,"
+        "0.0,0.0,0.0,10.0,50,2,CACGTG"
+    )
 
     actual = Sensor(
         (

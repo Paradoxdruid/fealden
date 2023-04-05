@@ -2,8 +2,7 @@ from unittest.mock import MagicMock, patch
 
 from fealden._unafold import RNAfolder
 
-SAMPLE_CT = """Calculating for stdin, t = 37
-13	dG = 0.892	stdin
+SAMPLE_CT = """13	dG = 0.892	stdin
 1	C	0	2	0	1	0	0
 2	A	1	3	0	2	0	0
 3	T	2	4	0	3	0	0
@@ -74,10 +73,12 @@ def test_parse_ct_to_folds() -> None:
     assert actual_lines == EXPECTED_CT_LINES
 
 
-@patch("fealden._unafold.subprocess.run")
-def test_collect_unafold_ct(mock_run: MagicMock) -> None:
+@patch("fealden._unafold.open")
+@patch("fealden._unafold.subprocess.Popen")
+def test_collect_unafold_ct(mock_run: MagicMock, mock_open: MagicMock) -> None:
     _ = RNAfolder.collect_unafold_ct("CATGCTAGCTAGT")
     mock_run.assert_called_once()
+    mock_open.assert_called_once()
 
 
 def test_return_basepair() -> None:
