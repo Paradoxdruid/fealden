@@ -8,6 +8,12 @@
 
 -------------------------
 
+## Quick use with docker
+
+**Fealden**, with all binary dependencies enabled, can conveniently be run as a docker container:
+
+`docker run --rm -it ghcr.io/paradoxdruid/fealden:latest`
+
 ## Dependencies
 
 **Fealden** is written for [Python 3.9+](https://www.python.org/), and depends upon external secondary structure prediction routines.
