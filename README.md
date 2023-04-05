@@ -2,6 +2,8 @@
 
 ![gpl3.0](https://img.shields.io/github/license/Paradoxdruid/academia-admin-automation.svg?color=success "Licensed under GPL 3.0")  [![CodeFactor](https://www.codefactor.io/repository/github/paradoxdruid/fealden/badge)](https://www.codefactor.io/repository/github/paradoxdruid/fealden)  [![Codacy Badge](https://app.codacy.com/project/badge/Grade/520de6c0a1aa463b8b12f4ddc746b4d3)](https://www.codacy.com/gh/Paradoxdruid/fealden/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Paradoxdruid/fealden&amp;utm_campaign=Badge_Grade) [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/520de6c0a1aa463b8b12f4ddc746b4d3)](https://app.codacy.com/gh/Paradoxdruid/fealden/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_coverage) [![CodeQL](https://github.com/Paradoxdruid/fealden/actions/workflows/codeql.yml/badge.svg)](https://github.com/Paradoxdruid/fealden/actions/workflows/codeql.yml) [![CI](https://github.com/Paradoxdruid/fealden/actions/workflows/CI.yml/badge.svg)](https://github.com/Paradoxdruid/fealden/actions/workflows/CI.yml) [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black) [![mypy](https://img.shields.io/badge/%20type_checker-mypy-%231674b1?style=flat)](https://github.com/python/mypy)
 
+[![PyPI](https://img.shields.io/pypi/v/fealden?color=success)](https://pypi.org/project/fealden/)
+
 ## Introduction
 
 **Fealden** is a command line tool to generate optimized structure switching DNA biosensors for fluorescent or electrochemical detection of trace amounts of a large number of biomolecule targets.  An abbreviated [bibliography](#bibliography) of works utilizing such nucleic acid-based biosensors is available below.
