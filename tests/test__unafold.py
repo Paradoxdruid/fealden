@@ -1,6 +1,10 @@
 from unittest.mock import MagicMock, patch
 
+from dotenv import load_dotenv
+
 from fealden._unafold import RNAfolder
+
+load_dotenv()
 
 SAMPLE_CT = """13	dG = 0.892	stdin
 1	C	0	2	0	1	0	0
@@ -85,3 +89,94 @@ def test_return_basepair() -> None:
     EXPECTED_PAIR_NUMBER = 13
     actual = RNAfolder.return_basepair(4, EXPECTED_CT_LINES[1])
     assert actual == EXPECTED_PAIR_NUMBER
+
+
+def test_RNAfolder_init() -> None:
+    EXPECTED_STRUCTURE_DICT = [
+        {
+            "deltaG": 0.892,
+            "bps": [
+                [1, 0],
+                [2, 0],
+                [3, 0],
+                [4, 0],
+                [5, 12],
+                [6, 11],
+                [7, 0],
+                [8, 0],
+                [9, 0],
+                [10, 0],
+                [11, 6],
+                [12, 5],
+                [13, 0],
+            ],
+        },
+        {
+            "deltaG": 1.407,
+            "bps": [
+                [1, 0],
+                [2, 0],
+                [3, 0],
+                [4, 13],
+                [5, 12],
+                [6, 11],
+                [7, 0],
+                [8, 0],
+                [9, 0],
+                [10, 0],
+                [11, 6],
+                [12, 5],
+                [13, 4],
+            ],
+        },
+    ]
+    actual = RNAfolder("catgctagctagt")
+
+    assert actual.structure_dict == EXPECTED_STRUCTURE_DICT
+
+
+def test_RNAfolder_dist_from_index() -> None:
+    actual = RNAfolder("catgctagctagt").dist_from_index(2, 8)
+
+    assert actual == 69.35416353759881
+
+
+def test_RNAfolder_dist() -> None:
+    actual = RNAfolder.dist(1, 1, 5, 5)
+
+    assert actual == 5.656854249492381
+
+
+def test_RNAfolder_dist_extra() -> None:
+    _, _, actual = RNAfolder.dist(1, 1, 5, 5, extra=True)  # type: ignore[misc]
+
+    assert actual == 5.656854249492381
+
+
+def test_RNAfolder__len() -> None:
+    actual = RNAfolder("catgctagctagt")
+
+    assert len(actual) == 13
+
+
+def test_RNAfolder__str() -> None:
+    actual = RNAfolder("catgctagctagt")
+
+    assert str(actual) == "CATGCTAGCTAGT"
+
+
+def test_RNAfolder__repr() -> None:
+    actual = RNAfolder("catgctagctagt")
+
+    assert (
+        repr(actual)
+        == "RNAfolder instance\n sequence input: CATGCTAGCTAGT\n \
+            number of structures: 2"
+    )
+
+
+def test_RNAfolder_find_best_tag() -> None:
+    EXPECTED_TAG = [{"1": (1, 9, 69.35416353759881)}, {"2": (1, 9, 72.18032973047436)}]
+    actual = RNAfolder("catgctagctagt").find_best_tag()
+
+    assert actual == EXPECTED_TAG
