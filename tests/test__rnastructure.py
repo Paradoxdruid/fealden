@@ -4,7 +4,7 @@ from unittest import mock
 
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv("../.env")
 
 RNA_PATH = os.getenv("RNASTRUCTURE", "/home")
 sys.path.append(os.path.join(RNA_PATH, "exe"))

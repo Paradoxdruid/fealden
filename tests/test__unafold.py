@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from fealden._unafold import RNAfolder
 
-load_dotenv()
+load_dotenv("../.env")
 
 SAMPLE_CT = """13	dG = 0.892	stdin
 1	C	0	2	0	1	0	0
