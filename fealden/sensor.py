@@ -282,7 +282,6 @@ class Sensor:
         MIN_OFF_CHANGE = 10
         tag_locs = self.get_tag_locations(MAX_ON_DIST, MIN_OFF_CHANGE)
 
-        max_avg_delta_on_to_off = 0
         # determine if this would make a good sensor if tagged in each possible
         # location
         for t in tag_locs:
@@ -343,17 +342,16 @@ class Sensor:
                 ]
             )
 
-            # CHANGE to check for best overall score
-            if max_avg_delta_on_to_off < weighted_avg_on_to_off_dist:
-                return (
-                    position,
-                    on_conc,
-                    off_conc,
-                    noise_conc,
-                    conc_wrong,
-                    conc_fuzzy,
-                    weighted_avg_on_to_off_dist,
-                )
+            # FIXME: Only returns first useful tag location, not best
+            return (
+                position,
+                on_conc,
+                off_conc,
+                noise_conc,
+                conc_wrong,
+                conc_fuzzy,
+                weighted_avg_on_to_off_dist,
+            )
 
         return 0
 

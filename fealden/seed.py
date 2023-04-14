@@ -215,7 +215,7 @@ class Seed:
         ].get_rec_seq_data()  # type: ignore[union-attr]
 
         # Create an RNSAstructure object
-        RNA_obj = structure.RNAfolder(seq)  # type:ignore
+        RNA_obj = structure.RNAfolder(seq)
         sen_in = seq.lower(), RNA_obj.structure_dict
         return sensor.Sensor(
             sen_in,

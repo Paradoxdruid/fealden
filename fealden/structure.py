@@ -2,6 +2,8 @@ import os
 
 from dotenv import load_dotenv
 
+__all__ = ["RNAfolder"]
+
 """fealden requies a .env file to specify external file locations and backend to use.
 
 Contents of an example .env file:
