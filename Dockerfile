@@ -74,8 +74,8 @@ ENV SIR_GRAPH=/root/mfold/bin/sir_graph
 
 # Get latest fealden
 ARG FORCE_UPDATE=no
-RUN cd ${HOME} && \
-    wget --no-check-certificate \
+WORKDIR ${HOME}
+RUN wget --no-check-certificate \
     https://github.com/Paradoxdruid/fealden/archive/refs/heads/master.tar.gz \
     -O "fealden-master.tar.gz" && \
     mkdir ./fealden && \
