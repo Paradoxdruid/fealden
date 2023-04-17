@@ -182,7 +182,7 @@ class Seed:
         self.build_the_rest(data[1:], nodes)
 
     def build_sensor(
-        self, core: int, version: int, base_seq: str
+        self, core: int, version: int, base_seq: str, fixed: bool
     ) -> sensor.Sensor | None:
         """
         build_sensor() first builds a 'Sensor' sequence using the 'Seed' of 'self'
@@ -224,6 +224,7 @@ class Seed:
             self.binding_state,
             self.name,
             base_seq,
+            fixed,
         )
 
     def generate_node_sizes(self) -> None:

@@ -117,6 +117,11 @@ def main() -> None:
         help="Interactive Mode, no file output",
     )
     parser.add_argument(
+        "--fixed",
+        action="store_true",
+        help="Fix methylene blue to 3' termini, no file output",
+    )
+    parser.add_argument(
         "-out",
         "-output_file",
         type=str,
@@ -155,11 +160,12 @@ def main() -> None:
         args.sps,
         args.interactive,
         args.out,
+        args.fixed,
     )
 
 
 def generate_sensor(
-    seed: seed.Seed, rec_seq: str, num_poss_sen: int, core: int
+    seed: seed.Seed, rec_seq: str, num_poss_sen: int, core: int, fixed: bool
 ) -> list[sensor.Sensor]:
     """
     generate_sensor() gens a # of possible sensors and returns a list of valid sensors.
@@ -169,6 +175,7 @@ def generate_sensor(
         recSeq      <-- a String, the recognition sequence
         numPossSen  <-- an integer, the number of possible sensors to be generated
         core        <-- an integer, the ID of the core in which this process is running
+        fixed       <-- bool, is methylene blue fixed at 3' terminus
 
     Retuns:
         sensors     <-- list of objecfs of the class 'Sensor'
@@ -183,7 +190,7 @@ def generate_sensor(
 
     while version < num_poss_sen:
         version += 1
-        sen = seed.build_sensor(core, version, rec_seq)
+        sen = seed.build_sensor(core, version, rec_seq, fixed)
 
         # only keep good sensors
         if sen is None:
@@ -231,6 +238,7 @@ class Fealden:
         min_sens_per_seed: int,
         interactive: bool,
         output_file: str,
+        fixed: bool,
     ) -> None:
         """Initialize new Fealden instance."""
         self.rec_seq = rec_seq
@@ -261,7 +269,9 @@ class Fealden:
         i = 0
         while i < num_process:
             i += 1
-            tasks.extend([(s, self.rec_seq, seed_sens_per_process, i) for s in seeds])
+            tasks.extend(
+                [(s, self.rec_seq, seed_sens_per_process, i, fixed) for s in seeds]
+            )
 
         for t in tasks:
             pool.apply_async(

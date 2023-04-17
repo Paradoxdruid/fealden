@@ -23,6 +23,7 @@ class Sensor:
         des_rec_seq_state: int,
         seed_name: str,
         base_seq: str,
+        fixed: bool,
     ):
         """
         This is the constructor for Sensor.
@@ -56,6 +57,7 @@ class Sensor:
         self.noise_conc = 0
         self.on_to_off_dist = 0
         self.base_seq = base_seq
+        self.fixed = fixed
         (self.tag_loc, self.score) = self.get_tag_and_score()
 
     def interpret_data(
@@ -229,21 +231,29 @@ class Sensor:
         self, MAX_ON_DIST: int, MIN_OFF_CHANGE: int
     ) -> list[tuple[int, list[int]]]:
         tag_locs = []
-        # get potential tagging locations and their distances in all the
+        # get potential tagging locations and their distances from the 5' in all the
         # various folds
-        for i, v in enumerate(self.seq):
-            if (
-                v.lower() == "t"
-                and (i + 1 < self.rec_seq["start"] or i + 1 > self.rec_seq["end"])
-                and (i + 1 < self.resp_seq["start"] or i + 1 > self.resp_seq["end"])
-            ):
-                distances = [f.get_distance(1, i + 1) for f in self.folds]
-                smallest_dist = min(distances)
+
+        # Fixed Methylene blue at 3' terminus
+        if self.fixed is True:
+            distances = [f.get_distance(1, len(self.seq)) for f in self.folds]
+            tag_locs.append((len(self.seq), distances))
+
+        # Else discover internal T placements
+        else:
+            for i, v in enumerate(self.seq):
                 if (
-                    smallest_dist <= MAX_ON_DIST
-                    and max(distances) - smallest_dist >= MIN_OFF_CHANGE
+                    v.lower() == "t"
+                    and (i + 1 < self.rec_seq["start"] or i + 1 > self.rec_seq["end"])
+                    and (i + 1 < self.resp_seq["start"] or i + 1 > self.resp_seq["end"])
                 ):
-                    tag_locs.append((i + 1, distances))
+                    distances = [f.get_distance(1, i + 1) for f in self.folds]
+                    smallest_dist = min(distances)
+                    if (
+                        smallest_dist <= MAX_ON_DIST
+                        and max(distances) - smallest_dist >= MIN_OFF_CHANGE
+                    ):
+                        tag_locs.append((i + 1, distances))
         return tag_locs
 
     def get_tagging_information(

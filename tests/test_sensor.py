@@ -129,6 +129,7 @@ def test_Sensor() -> None:
         1,
         "2",
         "CACGTG",
+        False,
     )
 
     assert repr(actual) == EXPECTED_SENSOR
