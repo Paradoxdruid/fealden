@@ -119,7 +119,12 @@ def main() -> None:
     parser.add_argument(
         "--fixed",
         action="store_true",
-        help="Fix methylene blue to 3' termini, no file output",
+        help="Fix methylene blue to 3' termini",
+    )
+    parser.add_argument(
+        "--thiol3",
+        action="store_false",
+        help="Fix thiol to 3' termini",
     )
     parser.add_argument(
         "-out",
@@ -161,11 +166,17 @@ def main() -> None:
         args.interactive,
         args.out,
         args.fixed,
+        args.thiol3,
     )
 
 
 def generate_sensor(
-    seed: seed.Seed, rec_seq: str, num_poss_sen: int, core: int, fixed: bool
+    seed: seed.Seed,
+    rec_seq: str,
+    num_poss_sen: int,
+    core: int,
+    fixed: bool,
+    thiol: bool,
 ) -> list[sensor.Sensor]:
     """
     generate_sensor() gens a # of possible sensors and returns a list of valid sensors.
@@ -190,7 +201,7 @@ def generate_sensor(
 
     while version < num_poss_sen:
         version += 1
-        sen = seed.build_sensor(core, version, rec_seq, fixed)
+        sen = seed.build_sensor(core, version, rec_seq, fixed, thiol)
 
         # only keep good sensors
         if sen is None:
@@ -239,6 +250,7 @@ class Fealden:
         interactive: bool,
         output_file: str,
         fixed: bool,
+        thiol: bool,
     ) -> None:
         """Initialize new Fealden instance."""
         self.rec_seq = rec_seq
@@ -270,7 +282,10 @@ class Fealden:
         while i < num_process:
             i += 1
             tasks.extend(
-                [(s, self.rec_seq, seed_sens_per_process, i, fixed) for s in seeds]
+                [
+                    (s, self.rec_seq, seed_sens_per_process, i, fixed, thiol)
+                    for s in seeds
+                ]
             )
 
         for t in tasks:

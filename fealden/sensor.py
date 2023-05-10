@@ -24,6 +24,7 @@ class Sensor:
         seed_name: str,
         base_seq: str,
         fixed: bool,
+        thiol: bool = True,
     ):
         """
         This is the constructor for Sensor.
@@ -58,6 +59,7 @@ class Sensor:
         self.on_to_off_dist = 0
         self.base_seq = base_seq
         self.fixed = fixed
+        self.thiol = thiol
         (self.tag_loc, self.score) = self.get_tag_and_score()
 
     def interpret_data(
@@ -235,8 +237,10 @@ class Sensor:
         # various folds
 
         # Fixed Methylene blue at 3' terminus
+        thiol_loc = len(self.seq) if not self.thiol else 1
+
         if self.fixed is True:
-            distances = [f.get_distance(1, len(self.seq)) for f in self.folds]
+            distances = [f.get_distance(thiol_loc, len(self.seq)) for f in self.folds]
             tag_locs.append((len(self.seq), distances))
 
         # Else discover internal T placements
@@ -247,7 +251,7 @@ class Sensor:
                     and (i + 1 < self.rec_seq["start"] or i + 1 > self.rec_seq["end"])
                     and (i + 1 < self.resp_seq["start"] or i + 1 > self.resp_seq["end"])
                 ):
-                    distances = [f.get_distance(1, i + 1) for f in self.folds]
+                    distances = [f.get_distance(thiol_loc, i + 1) for f in self.folds]
                     smallest_dist = min(distances)
                     if (
                         smallest_dist <= MAX_ON_DIST

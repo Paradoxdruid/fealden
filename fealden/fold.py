@@ -162,10 +162,7 @@ class Fold:
             distance   <- an integer, the calculated distance
         """
         if index1 > index2:
-            # TODO: Double-check this implementation
-            # temp = index1
-            index1 = index2
-            index2 = index1
+            index1, index2 = index2, index1
 
         node1 = self.ptr_list[index1 - 1]
         node2 = self.ptr_list[index2 - 1]
