@@ -110,5 +110,8 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# ruff cache
+.ruff_cache/
+
 # No notebooks
 *.ipynb
