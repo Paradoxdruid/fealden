@@ -15,7 +15,7 @@ def test_Fealden() -> None:
 
         with TemporaryDirectory() as tmpdirname:
             my_file = Path(tmpdirname).joinpath("test-results.csv")
-            Fealden("cacgtg", 1, 50, 500, False, str(my_file.resolve()), False)
+            Fealden("cacgtg", 1, 50, 500, False, str(my_file.resolve()), False, True)
 
             assert "aaacgcagtatgtggccatacacgtgatgtgagagacatccgttagttt" in str(
                 my_file.read_text()
@@ -57,6 +57,7 @@ def test_generate_sensor() -> None:
             500,
             1,
             False,
+            True,
         )
         assert repr(actual[0]) == EXPECTED_SENSOR
 
@@ -73,6 +74,9 @@ def test__main__(mock_arg: mock.Mock, mock_fealden: mock.Mock) -> None:
         out="test.csv",
         v=None,
         fixed=False,
+        thiol3=True,
     )
     main()
-    mock_fealden.assert_called_once_with("cacgtg", 1, 50, 500, None, "test.csv", False)
+    mock_fealden.assert_called_once_with(
+        "cacgtg", 1, 50, 500, None, "test.csv", False, True
+    )
