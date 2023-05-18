@@ -3,6 +3,7 @@
 import argparse
 import multiprocessing
 import re
+import textwrap
 import time
 import timeit
 
@@ -300,6 +301,17 @@ class Fealden:
         pool.join()
 
         s = sorted(sensors.values(), key=lambda sen: sen.score)
+
+        if len(s) == 0:
+            print(
+                textwrap.dedent(
+                    f"""\
+                    No sensors found for {self.rec_seq}
+                    in {str(timeit.default_timer() - time_zero)} seconds
+                    """
+                )
+            )
+            return None
 
         if not interactive:
             try:
